@@ -26,7 +26,8 @@ def callback_query(call):
     if call.data == 'lang_rus':
         markup = russian_employee()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text='Обясняем команды:\n/log_into для верификации.                    .\n/add_proposal добавить заявоку                   .\n/proposals посмотреть заявки                        . \n'.format(call.from_user.first_name), reply_markup=markup)
+                              text='Обясняем команды:\n/log_into для верификации.                    .\n/add_proposal добавить заявоку                   .\n/proposals посмотреть заявки                        . \n'.format(
+                                  call.from_user.first_name), reply_markup=markup)
     elif call.data == 'about_us_rus':
         markup = types.InlineKeyboardMarkup()
         back = types.InlineKeyboardButton('Назад', callback_data='back')
@@ -80,7 +81,10 @@ Komandala blan tanishtiramiz:
 /proposals zayavkalirini korishchun                         .
                               \n\n""", reply_markup=markup)
 
+
 user_info = {}
+
+
 @bot.message_handler(commands=['log_into'])
 def handle_services_worker(message):
     user_id = message.from_user.id
@@ -96,9 +100,9 @@ def handle_services_worker(message):
         keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
         reg_button = types.KeyboardButton(text="Nomeringizni taqdim eting", request_contact=True)
         keyboard.add(reg_button)
-        response = bot.send_message(message.chat.id,
-                                    "You should share your phone number",
-                                    reply_markup=keyboard)
+        bot.send_message(message.chat.id,
+                         "You should share your phone number",
+                         reply_markup=keyboard)
         bot.register_next_step_handler(message, check_handle_phone_number)
 
 
