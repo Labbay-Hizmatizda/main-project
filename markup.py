@@ -12,21 +12,18 @@ def russian():
     return markup
 
 
-# -------------------------------------------------------------------------------
 def my_account_rus():
     markup = types.InlineKeyboardMarkup()
 
-    change_phone_number = types.InlineKeyboardButton('Изменить номер', callback_data='change_number')
+    change_phone_number = types.InlineKeyboardButton('Изменить номер', callback_data='change_phone_num_rus')
     back = types.InlineKeyboardButton('◀ Назад', callback_data='back')
     markup.add(change_phone_number, back)
     return markup
 
-
-def change_phone_num():
+def change_phone_num_rus():
     ...
 
 
-# -------------------------------------------------------------------------------
 def orders_rus():
     markup = types.InlineKeyboardMarkup()
 
@@ -37,32 +34,70 @@ def orders_rus():
 
     return markup
 
-
 def active_orders_rus():
-    ...
+    markup = types.InlineKeyboardMarkup()
 
+    back = types.InlineKeyboardButton('◀ Назад', callback_data='back_orders')
+    markup.add(back)
+
+    return markup
 
 def new_order():
     ...
 
 
-# -------------------------------------------------------------------------------
-def login():
-    ...
 
-
-def register():
-    ...
+# uzbek lang-------------------------------------------------------------------------------
 
 def uzbek():
     markup = types.InlineKeyboardMarkup()
 
     about_us = types.InlineKeyboardButton('Biz Haqimizda', callback_data='about_us_uz')
-    my_account = types.InlineKeyboardButton('Mening danniylarim', callback_data='my_info_uz')
+    my_account = types.InlineKeyboardButton('Mening danniylarim', callback_data='my_account_uz')
     orders = types.InlineKeyboardButton('Buyurtlamarim', callback_data='orders_uz')
 
     markup.add(about_us, my_account, orders)
     return markup
+
+def my_account_uz():
+    markup = types.InlineKeyboardMarkup()
+
+    change_phone_number = types.InlineKeyboardButton('Nomerni o\'zgartirish', callback_data='change_phone_num_uz')
+    back = types.InlineKeyboardButton('◀ Orqaga', callback_data='back_uz')
+    markup.add(change_phone_number, back)
+    return markup
+
+def change_number_uz():
+    ...
+
+
+def orders_uz():
+    markup = types.InlineKeyboardMarkup()
+
+    active_orders = types.InlineKeyboardButton('Faol buyurtmalar', callback_data='active_orders_uz')
+    new_order = types.InlineKeyboardButton('Yangi buyurtma yaratish', callback_data='new_order_uz')
+    back = types.InlineKeyboardButton('◀ Orqaga', callback_data='back_uz')
+    markup.add(active_orders, new_order, back)
+
+    return markup
+
+def active_orders_uz():
+    markup = types.InlineKeyboardMarkup()
+
+    back = types.InlineKeyboardButton('◀ Orqaga', callback_data='back_orders_uz')
+    markup.add(back)
+
+    return markup
+
+def new_order_uz():
+    ...
+
+
+
+
+# -------------------------------------------------------------------------------
+
+
 
 def russian_employee():
     markup = types.InlineKeyboardMarkup()
