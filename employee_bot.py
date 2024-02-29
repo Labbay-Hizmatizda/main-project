@@ -24,7 +24,7 @@ def start(message):
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     if call.data == 'lang_rus':
-        markup = russian()
+        markup = russian_employee()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text='Обясняем команды:\n/log_into для верификации.                    .\n/add_proposal добавить заявоку                   .\n/proposals посмотреть заявки                        . \n'.format(call.from_user.first_name), reply_markup=markup)
     elif call.data == 'about_us_rus':
@@ -59,7 +59,7 @@ def callback_query(call):
                 -назад
         '''
     elif call.data == 'orders_rus':
-        markup = orders_rus()
+        markup = proposals_rus_employee()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Какую одну из функций :",
                               reply_markup=markup)
     elif call.data == 'active_orders':
@@ -69,12 +69,18 @@ def callback_query(call):
     elif call.data == 'back':
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Вы в главном меню \nКакое действие вы хотите сделать :z", reply_markup=markup)
-
+                              text="Вы в главном меню \nКакое действие вы хотите сделать", reply_markup=markup)
+    elif call.data == 'lang_uz':
+        markup = uzbek_employee()
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
+                              text="""
+Komandala blan tanishtiramiz:
+/log_into verifikasiya uchun.                          .
+/add_proposal zayavka tashashchun           .
+/proposals zayavkalirini korishchun                         .
+                              \n\n""", reply_markup=markup)
 
 user_info = {}
-
-
 @bot.message_handler(commands=['log_into'])
 def handle_services_worker(message):
     user_id = message.from_user.id

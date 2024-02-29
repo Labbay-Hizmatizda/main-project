@@ -54,12 +54,42 @@ def login():
 def register():
     ...
 
-# def uzbek():
-#     markup = types.InlineKeyboardMarkup()
+def uzbek():
+    markup = types.InlineKeyboardMarkup()
 
-#     about_us = types.InlineKeyboardButton('Biz Haqimizda', callback_data='about_us_uz')
-#     my_account = types.InlineKeyboardButton('Mening danniylarim', callback_data='my_info_uz')
-#     orders = types.InlineKeyboardButton('Buyurtlamarim', callback_data='orders_uz')
+    about_us = types.InlineKeyboardButton('Biz Haqimizda', callback_data='about_us_uz')
+    my_account = types.InlineKeyboardButton('Mening danniylarim', callback_data='my_info_uz')
+    orders = types.InlineKeyboardButton('Buyurtlamarim', callback_data='orders_uz')
 
-#     markup.add(about_us, my_account, orders)
-#     return markup
+    markup.add(about_us, my_account, orders)
+    return markup
+
+def russian_employee():
+    markup = types.InlineKeyboardMarkup()
+
+    about_us = types.InlineKeyboardButton('О нас', callback_data='about_us_rus')
+    my_account = types.InlineKeyboardButton('Мои Данные', callback_data='my_account_rus')
+    orders = types.InlineKeyboardButton('Заявки', callback_data='orders_rus')
+
+    markup.add(about_us, my_account, orders)
+    return markup
+
+def proposals_rus_employee():
+    markup = types.InlineKeyboardMarkup()
+
+    active_orders = types.InlineKeyboardButton('Активные Заявки', callback_data='active_orders')
+    new_order = types.InlineKeyboardButton('Создать новый Заявку', callback_data='new_order')
+    back = types.InlineKeyboardButton('◀ Назад', callback_data='back')
+    markup.add(active_orders, new_order, back)
+
+    return markup
+
+def uzbek_employee():
+    markup = types.InlineKeyboardMarkup()
+
+    about_us = types.InlineKeyboardButton('Biz Haqimizda', callback_data='about_us_uz')
+    my_account = types.InlineKeyboardButton('Mening danniylarim', callback_data='my_info_uz')
+    orders = types.InlineKeyboardButton('Buyurtlamarim', callback_data='orders_uz')
+
+    markup.add(about_us, my_account, orders)
+    return markup
