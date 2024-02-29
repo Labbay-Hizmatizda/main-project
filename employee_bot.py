@@ -2,6 +2,7 @@ import sqlite3
 import telebot
 from datetime import datetime
 from markup import *
+
 bot = telebot.TeleBot('6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8')
 
 user_data = {}
@@ -12,26 +13,27 @@ cursor = conn.cursor()
 
 @bot.message_handler(commands=['start'])
 def start(message):
-
     markup = types.InlineKeyboardMarkup()
     lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_rus')
     lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='lang_uz')
 
     markup.add(lang_rus, lang_uz)
-    bot.send_message(message.chat.id, "Выберите язык 🌐\nTilni tanlang 🌐", reply_markup=markup)
+    bot.send_message(message.chat.id, "Salom karochi\n\nВыберите язык 🌐\nTilni tanlang 🌐", reply_markup=markup)
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     if call.data == 'lang_rus':
         markup = russian()
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text='Привет, {0}!'.format(call.from_user.first_name), reply_markup=markup)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
+                              text='Обясняем команды:\n/log_into для верификации.                    .\n/add_proposal добавить заявоку                   .\n/proposals посмотреть заявки                        . \n'.format(call.from_user.first_name), reply_markup=markup)
     elif call.data == 'about_us_rus':
         markup = types.InlineKeyboardMarkup()
         back = types.InlineKeyboardButton('Назад', callback_data='back')
         markup.add(back)
 
-        bot.edit_message_text(chat_id=call.message.chat.id,message_id=call.message.id, text="У нас есть охуенный сайт хотите посетить ?\n pornhub.com", reply_markup=markup)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
+                              text="Bza haqimizada boladi", reply_markup=markup)
 
         '''
             -Мои данные
@@ -41,14 +43,14 @@ def callback_query(call):
         '''
     elif call.data == 'my_account_rus':
         markup = my_account_rus()
-        bot.edit_message_text(chat_id=call.message.chat.id,message_id=call.message.id, text="Какую одну из функций :", reply_markup=markup)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Какую одну из функций :",
+                              reply_markup=markup)
     elif call.data == 'change_number':
         ...
     elif call.data == 'back':
         markup = russian()
-        bot.edit_message_text(chat_id=call.message.chat.id,message_id=call.message.id, text="Какую одну из функций:", reply_markup=markup)
-
-
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Какую одну из функций:",
+                              reply_markup=markup)
 
         '''
             -Заказы
@@ -58,17 +60,21 @@ def callback_query(call):
         '''
     elif call.data == 'orders_rus':
         markup = orders_rus()
-        bot.edit_message_text(chat_id=call.message.chat.id,message_id=call.message.id, text="Какую одну из функций :", reply_markup=markup)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Какую одну из функций :",
+                              reply_markup=markup)
     elif call.data == 'active_orders':
-        bot.edit_message_text(chat_id=call.message.chat.id,message_id=call.message.id, text="Какую одну из функций :")
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Какую одну из функций :")
     elif call.data == 'new_order':
         pass
     elif call.data == 'back':
         markup = russian()
-        bot.edit_message_text(chat_id=call.message.chat.id,message_id=call.message.id, text="Вы в главном меню \nКакое действие вы хотите сделать :z", reply_markup=markup)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
+                              text="Вы в главном меню \nКакое действие вы хотите сделать :z", reply_markup=markup)
 
 
 user_info = {}
+
+
 @bot.message_handler(commands=['log_into'])
 def handle_services_worker(message):
     user_id = message.from_user.id
@@ -113,6 +119,7 @@ def check_handle_phone_number(message):
 
 
 def handle_user_id_relations(message):
+    user_id = message.from_user.id
     if message.text == "Xa":
         # ToDo: add user_id to accounts_reletion table
         ...
@@ -124,10 +131,13 @@ def handle_user_id_relations(message):
         yes_button = types.KeyboardButton(text="Xa")
         no_button = types.KeyboardButton(text="Yoq, boshqa nomer teraman")
         keyboard.add(yes_button, no_button)
-        bot.send_message(user_id, "Soobsheniyezi chunmadin, pasdigi knopkaladan bittasini ishlatin:", reply_markup=keyboard)
+        bot.send_message(user_id, "Soobsheniyezi chunmadin, pasdigi knopkaladan bittasini ishlatin:",
+                         reply_markup=keyboard)
         bot.register_next_step_handler(message, handle_user_id_relations)
 
+
 def handle_phone(message):
+    user_id = message.from_user.id
     phone_number = message.text
     user_info[phone_number] = {}
     bot.send_message(user_id, "Thank you. Now we can proceed.")
@@ -135,6 +145,7 @@ def handle_phone(message):
     print(user_info[user_id]['phone_number'])
     bot.send_message(user_id, "Введите ваше имя как указано в паспорте:")
     bot.register_next_step_handler(message, handle_name)
+
 
 def handle_name(message):
     user_id = message.from_user.id
@@ -157,7 +168,8 @@ def insert_all_user_data(message):
     date_created = datetime.now()
     cursor.execute("INSERT INTO admin_page_app_employee (user_id, name, surname, phone_number, date_created) VALUES ("
                    "?, ?, ?, ?, ?)",
-                   (user_id, user_info[user_id]['name'], user_info[user_id]['surname'], user_info[user_id]['phone_number'], date_created))
+                   (user_id, user_info[user_id]['name'], user_info[user_id]['surname'],
+                    user_info[user_id]['phone_number'], date_created))
     conn.commit()
 
     bot.send_message(user_id,
@@ -165,6 +177,8 @@ def insert_all_user_data(message):
 
 
 proposals = {}
+
+
 @bot.message_handler(commands=['add_proposal'])
 def handle_add_proposal(message):
     proposals[message.from_user.id] = {}
@@ -195,11 +209,12 @@ def handle_price(message):
 
     for user_id, proposal_data in proposals.items():
         cursor.execute("INSERT INTO admin_page_app_proposal (message, price, order_id, owner_id) VALUES (?, ?, ?, ?)",
-                      (proposal_data['message'], proposal_data['price'], proposal_data['order_id'], user_id))
+                       (proposal_data['message'], proposal_data['price'], proposal_data['order_id'], user_id))
 
     conn.commit()
 
-    bot.send_message(message, "Отлично! Теперь вы можете использовать команду /proposals для просмотра доступных proposallar.")
+    bot.send_message(message,
+                     "Отлично! Теперь вы можете использовать команду /proposals для просмотра доступных proposallar.")
 
 
 @bot.message_handler(commands=['proposals'])
@@ -218,6 +233,7 @@ def list_job_proposals(message):
                    types.InlineKeyboardButton(text='Cancel', callback_data=f'cancel_{proposal[0]}'))
         bot.send_message(user_id, f'Proposal {proposal[0]}: {proposal[1]}', reply_markup=markup)
 
+
 @bot.callback_query_handler(func=lambda call: True)
 def query_handler(call):
     action, proposal_id = call.data.split('_')
@@ -227,6 +243,7 @@ def query_handler(call):
         pass
 
 
-
 if __name__ == "__main__":
+    print("EmployeeBot started")
     bot.polling(none_stop=True)
+    print('EmployeeBot stopped')
