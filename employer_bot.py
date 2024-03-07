@@ -47,8 +47,6 @@ def callback_query(call):
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id,message_id=call.message.id, text="Вы в главном меню \nКакое действие вы хотите сделать :", reply_markup=markup)
 
-
-
         '''
             -Заказы
                 -активные заказы
@@ -81,9 +79,10 @@ def callback_query(call):
         markup.add(back)
 
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="У нас есть сайт хотите посетить ?", reply_markup=markup)
+        bot.edit_message_text()
+        bot.edit_message_text()
 
-
-    elif call.data == 'my_account_uz':
+    elif call.data == 'my_account_uz': 
         markup = my_account_uz()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Какое действие вы хотите сделать :", reply_markup=markup)
     elif call.data == 'change_phone_num_uz':

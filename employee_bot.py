@@ -50,8 +50,9 @@ def callback_query(call):
         ...
     elif call.data == 'back':
         markup = russian()
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Какую одну из функций:",
-                              reply_markup=markup)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
+                              text='Обясняем команды:\n/log_into для верификации.                    .\n/add_proposal добавить заявоку                   .\n/proposals посмотреть заявки                        . \n'.format(
+                                  call.from_user.first_name), reply_markup=markup) 
 
         '''
             -Заказы
@@ -64,13 +65,20 @@ def callback_query(call):
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Какую одну из функций :",
                               reply_markup=markup)
     elif call.data == 'active_orders':
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Какую одну из функций :")
+        markup = active_orders_rus_employee()
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Какую одну из функций :", reply_markup=markup)
+    elif call.data == 'back_orders_employee':
+        markup = proposals_rus_employee()
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Какое действие вы хотите сделать :", reply_markup=markup)
+
     elif call.data == 'new_order':
         pass
     elif call.data == 'back':
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Вы в главном меню \nКакое действие вы хотите сделать", reply_markup=markup)
+        
+#--uzbek-------------------------------------------------------------------------------------------
     elif call.data == 'lang_uz':
         markup = uzbek_employee()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,

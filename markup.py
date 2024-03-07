@@ -119,6 +119,15 @@ def proposals_rus_employee():
 
     return markup
 
+def active_orders_rus_employee():
+    markup = types.InlineKeyboardMarkup()
+
+    back = types.InlineKeyboardButton('◀ Назад', callback_data='back_orders_employee')
+    markup.add(back)
+
+    return markup
+
+
 def uzbek_employee():
     markup = types.InlineKeyboardMarkup()
 
