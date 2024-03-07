@@ -238,9 +238,6 @@ def handle_price(message):
 @bot.message_handler(commands=['proposals'])
 def list_job_proposals(message):
     user_id = message.chat.id
-    # cursor.execute("SELECT owner_id FROM admin_page_app_employee where user_id=?", (user_id,))
-    # id = cursor.fetchone()
-    # print(id)
     cursor.execute("SELECT * FROM admin_page_app_proposal WHERE owner_id=?", (user_id,))
     proposals = cursor.fetchall()
     print(proposals)
