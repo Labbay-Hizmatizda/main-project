@@ -273,7 +273,7 @@ def handle_price(message):
 @bot.message_handler(commands=['orders'])
 def list_orders(message):
     user_id = message.chat.id
-    cursor.execute("SELECT * FROM admin_page_app_order WHERE owner_id=?", (employer_id,))
+    cursor.execute("SELECT * FROM admin_page_app_order WHERE owner_id=?", (user_id,))
     orders = cursor.fetchall()
 
     for order in orders:
