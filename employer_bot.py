@@ -82,47 +82,47 @@ def callback_query(call):
     if call.data == 'lang_uz':
         markup = uzbek()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text='Привет, {0}!'.format(call.from_user.first_name), reply_markup=markup)
+                              text='Salom, {0}!'.format(call.from_user.first_name), reply_markup=markup)
     elif call.data == 'about_us_uz':
         markup = types.InlineKeyboardMarkup()
         back = types.InlineKeyboardButton('Orqaga', callback_data='back')
         markup.add(back)
 
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="У нас есть сайт хотите посетить ?", reply_markup=markup)
+                              text="Saytimizaga kirishni hohlaysizmi", reply_markup=markup)
         bot.edit_message_text()
         bot.edit_message_text()
 
     elif call.data == 'my_account_uz':
         markup = my_account_uz()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Какое действие вы хотите сделать :", reply_markup=markup)
+                              text="Nima qmohchisiz:", reply_markup=markup)
     elif call.data == 'change_phone_num_uz':
         ...
     elif call.data == 'back':
         markup = uzbek()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Вы в главном меню \nКакое действие вы хотите сделать :", reply_markup=markup)
+                              text="Glavni menyu \nNma qmohchisiz: ", reply_markup=markup)
 
 
     elif call.data == 'orders_uz':
         markup = orders_uz()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Заказы\nКакое действие вы хотите сделать :", reply_markup=markup)
+                              text="Zakazla\nNma qmohchisiz: ", reply_markup=markup)
     elif call.data == 'active_orders_uz':
         markup = active_orders_uz()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Aктивные заказы\nКакое действие вы хотите сделать :", reply_markup=markup)
+                              text="Aktivni Zakazla\nNma qmohchisiz: ", reply_markup=markup)
     elif call.data == 'back_orders_uz':
         markup = orders_uz()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Какое действие вы хотите сделать :", reply_markup=markup)
+                              text="Nma qmohchisiz: ", reply_markup=markup)
     elif call.data == 'new_order':
         pass
     elif call.data == 'back_uz':
         markup = uzbek()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Вы в главном меню \nКакое действие вы хотите сделать :", reply_markup=markup)
+                              text="Glavni menyu \nNma qmohchisiz: ", reply_markup=markup)
 
 
 user_info = {}
