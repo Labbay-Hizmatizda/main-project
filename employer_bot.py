@@ -12,32 +12,7 @@ cursor = conn.cursor()
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    user_id = message.from_user.id
-
-    cursor.execute('''CREATE TABLE IF NOT EXISTS admin_page_app_language (
-                        id INTEGER PRIMARY KEY,
-                        user_id INTEGER,
-                        language VARCHAR
-                    )''')
-    conn.commit()
-
-    cursor.execute("SELECT * FROM admin_page_app_language WHERE user_id=?", (user_id,))
-    existing_user = cursor.fetchone()
-    if existing_user:
-        user_lang[user_id] = existing_user[2]
-        if user_lang[user_id] == 'rus':
-            markup = russian()
-            bot.send_message(message.chat.id, "Выберите команду", reply_markup=markup)
-        else:
-            markup = uzbek()
-            bot.send_message(message.chat.id, "Komanda tanlen", reply_markup=markup)
-    else:
-        markup = types.InlineKeyboardMarkup()
-        lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_rus')
-        lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='lang_uz')
-
-        markup.add(lang_rus, lang_uz)
-        bot.send_message(message.chat.id, "Выберите язык 🌐\nTilni tanlang 🌐", reply_markup=markup)
+    lang_identifier(message)
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -45,7 +20,9 @@ def callback_query(call):
     if call.data == 'lang_rus':
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text='Обясняем команды:\n/log_into для верификации.                    .\n/add_proposal добавить заказ                   .\n/proposals посмотреть заказы                        . \n'.format(
+                              text='Обясняем команды:\n/log_into для верификации.                    .\n/add_proposal '
+                                   'добавить заказ                   .\n/proposals посмотреть заказы                  '
+                                   '      . \n'.format(
                                   call.from_user.first_name), reply_markup=markup)
     elif call.data == 'about_us_rus':
         markup = types.InlineKeyboardMarkup()
@@ -149,38 +126,42 @@ user_info = {}
 
 
 @bot.message_handler(commands=['log_into'])
+@bot.message_handler(commands=['shaxsni_tasdiqlash'])
+@bot.message_handler(commands=['potverdeniye_lichnosti'])
 def handle_services_worker(message):
     user_id = message.from_user.id
     user_info[user_id] = {}
 
     cursor.execute("SELECT * FROM admin_page_app_employer WHERE user_id=?", (user_id,))
     existing_user = cursor.fetchone()
-
     if existing_user:
         bot.send_message(user_id, "Добро пожаловать обратно! tipa oldin reg qilib login qibogan")
-    elif message.contact.phone_number if message.contact else False:
-        bot.send_message(user_id, "Для начала, давайте заполним некоторые дополнительные данные.")
-        bot.send_message(user_id, "Введите ваше номер телефона:")
-        bot.register_next_step_handler(message, check_handle_phone_number)
     else:
-        bot.send_message(user_id, "Добро пожаловать обратно!, tipa regestratsiya otboldi")
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        phone_button = types.KeyboardButton(text="Share my phone number", request_contact=True)
+        markup.add(phone_button)
+        bot.send_message(user_id, "Добро пожаловать, nomerini berishi kere", reply_markup=markup)
+        bot.register_next_step_handler(message, check_handle_phone_number)
 
 
 def check_handle_phone_number(message):
     user_id = message.from_user.id
-    phone_number = message.text
-    # ToDo: checking if phone number written valid
+    phone_number = message.contact.phone_number if message.contact else None
+    print(phone_number)
     user_info[user_id]['phone_number'] = phone_number
     if phone_number:
         cursor.execute("SELECT * FROM admin_page_app_employer WHERE phone_number=?", (phone_number,))
         existing_user = cursor.fetchone()
 
         if existing_user:
-            bot.send_message(phone_number, "Добро пожаловать обратно!")
+            # ToDo: sending sms in order to verify user
+            bot.send_message(user_id, "Добро пожаловать обратно!")
         else:
-            bot.send_message(phone_number, "Yengi useraka, keyingi stepga otamiz")
-            bot.send_message(phone_number, "Введите ваше имя:")
+            bot.send_message(user_id, "Yengi useraka, keyingi stepga otamiz")
+            bot.send_message(user_id, "Введите ваше имя:")
             bot.register_next_step_handler(message, handle_name)
+    else:
+        bot.send_message(user_id, "Invalid phone number. Please share your phone number again.")
 
 
 def handle_phone(message):
@@ -302,6 +283,7 @@ def list_orders(message):
                    types.InlineKeyboardButton(text='Cancel', callback_data=f'cancel_{order[0]}'))
         bot.send_message(user_id, f'Order {order[0]}: {order[1]}', reply_markup=markup)
 
+
 @bot.callback_query_handler(func=lambda call: True)
 def query_handler(call):
     action, order_id = call.data.split('_')
@@ -312,16 +294,47 @@ def query_handler(call):
         # Implement cancel functionality
         pass
 
+
 @bot.message_handler(func=lambda message: True)
 def echo_all(message):
     bot.reply_to(message, "Я не понимаю эту команду. Попробуйте /help для списка команд.")
+
+
+def lang_identifier(message):
+    user_id = message.from_user.id
+
+    cursor.execute('''CREATE TABLE IF NOT EXISTS admin_page_app_language (
+                            id INTEGER PRIMARY KEY,
+                            user_id INTEGER,
+                            language VARCHAR
+                        )''')
+    conn.commit()
+
+    cursor.execute("SELECT * FROM admin_page_app_language WHERE user_id=?", (user_id,))
+    existing_user = cursor.fetchone()
+    if existing_user:
+        user_lang[user_id] = existing_user[2]
+        if user_lang[user_id] == 'rus':
+            markup = russian()
+            bot.send_message(message.chat.id, "Выберите команду", reply_markup=markup)
+        else:
+            markup = uzbek()
+            bot.send_message(message.chat.id, "Komanda tanlen", reply_markup=markup)
+    else:
+        markup = types.InlineKeyboardMarkup()
+        lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_rus')
+        lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='lang_uz')
+
+        markup.add(lang_rus, lang_uz)
+        bot.send_message(message.chat.id, "Выберите язык 🌐\nTilni tanlang 🌐", reply_markup=markup)
 
 
 if __name__ == "__main__":
     print('\n.', '.', '.\n')
     bot.polling(none_stop=True)
 
-'''Вывод деталей ------------------------------------------------------------------------------------------------------------'''
+'''Вывод деталей 
+------------------------------------------------------------------------------------------------------------'''
 # @bot.message_handler(func=lambda message: message.text == "Мои данные")
 # def handle_my_actions(message):
 #     # Получаем информацию о пользователе
