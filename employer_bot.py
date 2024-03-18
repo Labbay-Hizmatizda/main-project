@@ -205,9 +205,9 @@ def insert_all_user_data(message):
                      "Отлично! Теперь вы можете использовать команду /jobs для просмотра доступных действий.")
 
 
+
+
 orders = {}
-
-
 @bot.message_handler(commands=['add_order'])
 def handle_add_order(message):
     orders[message.from_user.id] = {}
@@ -271,6 +271,8 @@ def handle_price(message):
     bot.send_message(user_id, "Order added successfully!, /orders to see your order")
 
 
+
+
 @bot.message_handler(commands=['orders'])
 def list_orders(message):
     user_id = message.chat.id
@@ -320,7 +322,7 @@ def lang_identifier(message):
         else:
             markup = uzbek()
             bot.send_message(message.chat.id, "Komanda tanlen", reply_markup=markup)
-    else:
+    else:   
         markup = types.InlineKeyboardMarkup()
         lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_rus')
         lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='lang_uz')
