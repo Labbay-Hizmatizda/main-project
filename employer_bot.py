@@ -205,7 +205,6 @@ def handle_id_image_first(message):
 
     # Save image
     file_id = message.photo[2].file_id
-    print(file_id)
     photo_path = os.path.join(directory, "id_image_first.jpg")
     r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
     if r.status_code == 200:
@@ -420,7 +419,7 @@ def lang_identifier(message):
         else:
             markup = uzbek()
             bot.send_message(message.chat.id, "Komanda tanlen", reply_markup=markup)
-    else:   
+    else:
         markup = types.InlineKeyboardMarkup()
         lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_rus')
         lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='lang_uz')
@@ -432,22 +431,3 @@ def lang_identifier(message):
 if __name__ == "__main__":
     print('\n.', '.', '.\n')
     bot.polling(none_stop=True)
-
-'''Вывод деталей 
-------------------------------------------------------------------------------------------------------------'''
-# @bot.message_handler(func=lambda message: message.text == "Мои данные")
-# def handle_my_actions(message):
-#     # Получаем информацию о пользователе
-#     username = message.from_user.username
-#     user_id = message.from_user.id
-#     phone_number = message.contact.phone_number
-#     # bot.send_message(message.chat.id, f'Спасибо, @{username}! Ваш номер телефона: {phone_number}')
-
-#     # Запрашиваем номер телефона
-#     bot.send_message(message.chat.id, f'Привет, @{username}! Пожалуйста, отправьте свой номер телефона.')
-
-#     # Обработчик для получения номера телефона
-# @bot.message_handler(content_types=['contact'])
-# def handle_contact(message):
-#     phone_number = message.contact.phone_number
-#     bot.send_message(message.chat.id, f'Спасибо, @! Ваш номер телефона: {phone_number}')
