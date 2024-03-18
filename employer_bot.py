@@ -1,9 +1,11 @@
 import sqlite3
 from datetime import datetime
-
+import os
 import telebot
-from markup import *
+import requests
 
+from markup import *
+token = '6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8'
 bot = telebot.TeleBot('6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8')
 user_lang = {}
 conn = sqlite3.connect('db.sqlite3', check_same_thread=False)
@@ -147,7 +149,6 @@ def handle_services_worker(message):
 def check_handle_phone_number(message):
     user_id = message.from_user.id
     phone_number = message.contact.phone_number if message.contact else None
-    print(phone_number)
     user_info[user_id]['phone_number'] = phone_number
     if phone_number:
         cursor.execute("SELECT * FROM admin_page_app_employer WHERE phone_number=?", (phone_number,))
@@ -164,17 +165,6 @@ def check_handle_phone_number(message):
         bot.send_message(user_id, "Invalid phone number. Please share your phone number again.")
 
 
-def handle_phone(message):
-    user_id = message.from_user.id
-    phone_number = message.text
-    user_info[phone_number] = {}
-    bot.send_message(phone_number, "Thank you. Now we can proceed.")
-
-    print(user_info[user_id]['phone_number'])
-    bot.send_message(user_id, "Введите ваше имя как указано в паспорте:")
-    bot.register_next_step_handler(message, handle_name)
-
-
 def handle_name(message):
     user_id = message.from_user.id
     user_info[user_id]['name'] = message.text
@@ -186,8 +176,116 @@ def handle_name(message):
 def handle_surname(message):
     user_id = message.from_user.id
     user_info[user_id]['surname'] = message.text
+    bot.send_message(user_id, "Выберите тип идентификатора")
+    bot.register_next_step_handler(message, handle_choosing_identifier_type)
 
-    bot.register_next_step_handler(message, insert_all_user_data)
+
+def handle_choosing_identifier_type(message):
+    user_id = message.from_user.id
+    identifier_type = message.text
+    user_info[user_id]['identifier_type'] = identifier_type
+
+    if identifier_type == "passport":
+        bot.send_message(user_id, "Пришлите изображение паспорта")
+        bot.register_next_step_handler(message, handle_passport_image)
+    elif identifier_type == "id":
+        bot.send_message(user_id, "Пришлите изображения удостоверения личности")
+        bot.register_next_step_handler(message, handle_id_image_first)
+    else:
+        bot.send_message(user_id, "Тип идентификатора не распознан. Пожалуйста, выберите тип идентификатора снова.")
+        handle_choosing_identifier_type(message)
+
+def handle_id_image_first(message):
+    user_id = message.from_user.id
+    phone_number = user_info[user_id]['phone_number']
+
+    directory = os.path.join("media", "identifiers", str(phone_number))
+
+    os.makedirs(directory, exist_ok=True)
+
+    # Save image
+    file_id = message.photo[2].file_id
+    print(file_id)
+    photo_path = os.path.join(directory, "id_image_first.jpg")
+    r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
+    if r.status_code == 200:
+        file_info = r.json()
+        file_path = file_info['result']['file_path']
+        photo_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+        response = requests.get(photo_url)
+        print(response.status_code)
+        if response.status_code == 200:
+            with open(photo_path, 'wb') as f:
+                f.write(response.content)
+                bot.send_message(user_id,
+                                 "Image saved seccessfully. Please send the second image of your ID.")
+        else:
+            bot.send_message(user_id,
+                             "Failed to download image.")
+            bot.register_next_step_handler(message, handle_id_image_first)
+
+    # Failed to download image
+    # Handle the error accordingly
+    else:
+        bot.send_message(user_id,
+                         "Failed to get file information.")
+        bot.register_next_step_handler(message, handle_id_image_first)
+    # Failed to get file information
+    # Handle the error accordingly
+    bot.register_next_step_handler(message, handle_id_image_second)
+
+def handle_id_image_second(message):
+    user_id = message.from_user.id
+    phone_number = user_info[user_id]['phone_number']
+
+    directory = os.path.join("media", "identifiers", str(phone_number))
+
+    os.makedirs(directory, exist_ok=True)
+
+    # Save image
+    file_id = message.photo[2].file_id
+    photo_path = os.path.join(directory, "id_image_second.jpg")
+    r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
+    if r.status_code == 200:
+        file_info = r.json()
+        file_path = file_info['result']['file_path']
+        photo_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+        response = requests.get(photo_url)
+        if response.status_code == 200:
+            with open(photo_path, 'wb') as f:
+                f.write(response.content)
+                bot.send_message(user_id,
+                                 "Image saved seccessfully. Wait a time to process your data.")
+        else:
+            ...
+    # Failed to download image
+    # Handle the error accordingly
+    else:
+        ...
+    # Failed to get file information
+    # Handle the error accordingly
+
+    # Call function to insert user data for second ID image
+    insert_all_user_data(message)
+
+
+def handle_passport_image(message):
+    user_id = message.from_user.id
+    phone_number = user_info[user_id]['phone_number']
+
+    directory = os.path.join("media", "identifiers", str(phone_number))
+
+    os.makedirs(directory, exist_ok=True)
+
+    # Save images
+    for i, photo in enumerate(message.photo, start=1):
+        photo_file_id = photo.file_id
+        photo_path = os.path.join(directory, f"photo_{i}.jpg")
+        photo_file = bot.get_file(photo_file_id)
+        photo_file.download_file(photo_path)
+
+    # Call function to insert all user data
+    insert_all_user_data(message)
 
 
 def insert_all_user_data(message):
