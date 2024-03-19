@@ -37,7 +37,7 @@ def callback_query(call):
         '''
             -Мои данные
                 -Изменить номер
-                -Изменить пароль от аккаунта 
+                -Изменить пароль от аккаунта
                 -Назад
         '''
     elif call.data == 'my_account_rus':
@@ -159,7 +159,7 @@ def check_handle_phone_number(message):
             bot.send_message(user_id, "Добро пожаловать обратно!")
         else:
             bot.send_message(user_id, "Yengi useraka, keyingi stepga otamiz")
-            bot.send_message(user_id, "Введите ваше имя:")
+            bot.send_message(user_id, "Введите ваше имя:", reply_markup=None)
             bot.register_next_step_handler(message, handle_name)
     else:
         bot.send_message(user_id, "Invalid phone number. Please share your phone number again.")
