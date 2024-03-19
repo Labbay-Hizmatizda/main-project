@@ -145,6 +145,7 @@ def handle_services_worker(message):
         bot.send_message(user_id, "Добро пожаловать, nomerini berishi kere", reply_markup=markup)
         bot.register_next_step_handler(message, check_handle_phone_number)
 
+from telebot.types import ReplyKeyboardRemove
 
 def check_handle_phone_number(message):
     user_id = message.from_user.id
@@ -156,10 +157,10 @@ def check_handle_phone_number(message):
 
         if existing_user:
             # ToDo: sending sms in order to verify user
-            bot.send_message(user_id, "Добро пожаловать обратно!")
+            bot.send_message(user_id, "Добро пожаловать обратно!", reply_markup=ReplyKeyboardRemove())
         else:
-            bot.send_message(user_id, "Yengi useraka, keyingi stepga otamiz")
-            bot.send_message(user_id, "Введите ваше имя:", reply_markup=None)
+            bot.send_message(user_id, "Yengi useraka, keyingi stepga otamiz", reply_markup=ReplyKeyboardRemove())
+            bot.send_message(user_id, "Введите ваше имя:")
             bot.register_next_step_handler(message, handle_name)
     else:
         bot.send_message(user_id, "Invalid phone number. Please share your phone number again.")
