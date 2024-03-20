@@ -5,6 +5,7 @@ import telebot
 import requests
 
 from markup import *
+
 token = '6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8'
 bot = telebot.TeleBot('6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8')
 user_lang = {}
@@ -14,12 +15,15 @@ cursor = conn.cursor()
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    lang_identifier(message)
-
+    lang = lang_identifier(message)
+    user_language(message, lang)
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     if call.data == 'lang_rus':
+        user_lang[call.from_user.id] = 'rus'
+        cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
+                          VALUES (?, ?)''', (call.from_user.id, 'rus'))
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text='Обясняем команды:\n/log_into для верификации.                    .\n/add_proposal '
@@ -79,6 +83,9 @@ def callback_query(call):
     # --uzbek lang ---------------------------------------------------------------------------------------------
 
     if call.data == 'lang_uz':
+        user_lang[call.from_user.id] = 'uz'
+        cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
+                          VALUES (?, ?)''', (call.from_user.id, 'uz'))
         markup = uzbek()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text='Salom, {0}!'.format(call.from_user.first_name), reply_markup=markup)
@@ -127,9 +134,7 @@ def callback_query(call):
 user_info = {}
 
 
-@bot.message_handler(commands=['log_into'])
-@bot.message_handler(commands=['shaxsni_tasdiqlash'])
-@bot.message_handler(commands=['potverdeniye_lichnosti'])
+@bot.message_handler(commands=['potverdeniye_lichnosti', 'log_into', 'shaxsni_tasdiqlash'])
 def handle_services_worker(message):
     user_id = message.from_user.id
     user_info[user_id] = {}
@@ -145,7 +150,9 @@ def handle_services_worker(message):
         bot.send_message(user_id, "Добро пожаловать, nomerini berishi kere", reply_markup=markup)
         bot.register_next_step_handler(message, check_handle_phone_number)
 
+
 from telebot.types import ReplyKeyboardRemove
+
 
 def check_handle_phone_number(message):
     user_id = message.from_user.id
@@ -196,6 +203,7 @@ def handle_choosing_identifier_type(message):
         bot.send_message(user_id, "Тип идентификатора не распознан. Пожалуйста, выберите тип идентификатора снова.")
         handle_choosing_identifier_type(message)
 
+
 def handle_id_image_first(message):
     user_id = message.from_user.id
     phone_number = user_info[user_id]['phone_number']
@@ -233,6 +241,7 @@ def handle_id_image_first(message):
     # Failed to get file information
     # Handle the error accordingly
     bot.register_next_step_handler(message, handle_id_image_second)
+
 
 def handle_id_image_second(message):
     user_id = message.from_user.id
@@ -303,9 +312,9 @@ def insert_all_user_data(message):
                      "Отлично! Теперь вы можете использовать команду /jobs для просмотра доступных действий.")
 
 
-
-
 orders = {}
+
+
 @bot.message_handler(commands=['add_order'])
 def handle_add_order(message):
     orders[message.from_user.id] = {}
@@ -369,8 +378,6 @@ def handle_price(message):
     bot.send_message(user_id, "Order added successfully!, /orders to see your order")
 
 
-
-
 @bot.message_handler(commands=['orders'])
 def list_orders(message):
     user_id = message.chat.id
@@ -402,24 +409,23 @@ def echo_all(message):
 
 def lang_identifier(message):
     user_id = message.from_user.id
-
-    cursor.execute('''CREATE TABLE IF NOT EXISTS admin_page_app_language (
-                            id INTEGER PRIMARY KEY,
-                            user_id INTEGER,
-                            language VARCHAR
-                        )''')
-    conn.commit()
-
     cursor.execute("SELECT * FROM admin_page_app_language WHERE user_id=?", (user_id,))
     existing_user = cursor.fetchone()
     if existing_user:
         user_lang[user_id] = existing_user[2]
-        if user_lang[user_id] == 'rus':
-            markup = russian()
-            bot.send_message(message.chat.id, "Выберите команду", reply_markup=markup)
-        else:
-            markup = uzbek()
-            bot.send_message(message.chat.id, "Komanda tanlen", reply_markup=markup)
+        return user_lang
+
+def user_language(message, lang):
+    if lang == 'rus':
+        markup = russian()
+        bot.send_message(message.chat.id,
+                         text='Обясняем команды:\n/log_into для верификации.                    .\n/add_proposal '
+                              'добавить заказ                   .\n/proposals посмотреть заказы                  '
+                              '      . \n'.format(
+                             message.from_user.first_name), reply_markup=markup)
+    elif lang == 'uz':
+        markup = uzbek()
+        bot.send_message(message.chat.id, "Komanda tanlen", reply_markup=markup)
     else:
         markup = types.InlineKeyboardMarkup()
         lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_rus')
