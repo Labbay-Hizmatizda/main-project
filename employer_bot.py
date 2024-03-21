@@ -11,12 +11,23 @@ bot = telebot.TeleBot('6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8')
 user_lang = {}
 conn = sqlite3.connect('db.sqlite3', check_same_thread=False)
 cursor = conn.cursor()
-
+chat_text = {}
 
 @bot.message_handler(commands=['start'])
 def start(message):
+    chat_text['salomlashish'] = {}
+    user_id = message.from_user.id
+    salomlashish_uz = 'Salom, {}!'.format(message.from_user.first_name)
+    salomlashish_rus = 'Привет, {}!'.format(message.from_user.first_name)
     lang = lang_identifier(message)
-    user_language(message, lang)
+    print(lang)
+    if lang:
+        if lang[user_id] == 'rus':
+            bot.send_message(message.chat.id, salomlashish_rus)
+        elif lang[user_id] == 'uz':
+            bot.send_message(message.chat.id, salomlashish_uz)
+    else:
+        user_language_req(message)
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
@@ -30,14 +41,6 @@ def callback_query(call):
                                    'добавить заказ                   .\n/proposals посмотреть заказы                  '
                                    '      . \n'.format(
                                   call.from_user.first_name), reply_markup=markup)
-    elif call.data == 'about_us_rus':
-        markup = types.InlineKeyboardMarkup()
-        back = types.InlineKeyboardButton('Назад', callback_data='back')
-        markup.add(back)
-
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="У нас есть сайт хотите посетить?", reply_markup=markup)
-
         '''
             -Мои данные
                 -Изменить номер
@@ -73,8 +76,6 @@ def callback_query(call):
         markup = orders_rus()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Какое действие вы хотите сделать :", reply_markup=markup)
-    elif call.data == 'new_order':
-        pass
     elif call.data == 'back':
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
@@ -89,15 +90,6 @@ def callback_query(call):
         markup = uzbek()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text='Salom, {0}!'.format(call.from_user.first_name), reply_markup=markup)
-    elif call.data == 'about_us_uz':
-        markup = types.InlineKeyboardMarkup()
-        back = types.InlineKeyboardButton('Orqaga', callback_data='back')
-        markup.add(back)
-
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Saytimizaga kirishni hohlaysizmi", reply_markup=markup)
-        bot.edit_message_text()
-        bot.edit_message_text()
 
     elif call.data == 'my_account_uz':
         markup = my_account_uz()
@@ -123,12 +115,25 @@ def callback_query(call):
         markup = orders_uz()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Nma qmohchisiz: ", reply_markup=markup)
-    elif call.data == 'new_order':
-        pass
     elif call.data == 'back_uz':
         markup = uzbek()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Glavni menyu \nNma qmohchisiz: ", reply_markup=markup)
+    elif call.data == 'lang_rus_onstart':
+        user_lang[call.from_user.id] = 'rus'
+        cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
+                          VALUES (?, ?)''', (call.from_user.id, 'rus'))
+        conn.commit()
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
+                              text="Vibran rus yazik: ")
+    elif call.data == 'lang_uz_onstart':
+        user_lang[call.from_user.id] = 'uz'
+        cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
+                          VALUES (?, ?)''', (call.from_user.id, 'uz'))
+        conn.commit()
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
+                              text="Vibran uz yazik: ")
+
 
 
 user_info = {}
@@ -375,6 +380,7 @@ def handle_price(message):
         (order_data['category'], order_data['description'], order_data['image'], order_data['location'],
          order_data['location_link'], order_data['price'], user_id)
     )
+    conn.commit()
     bot.send_message(user_id, "Order added successfully!, /orders to see your order")
 
 
@@ -409,30 +415,30 @@ def echo_all(message):
 
 def lang_identifier(message):
     user_id = message.from_user.id
-    cursor.execute("SELECT * FROM admin_page_app_language WHERE user_id=?", (user_id,))
+    # if user_lang[user_id] == 'uz' or user_lang[user_id] == 'rus':
+    #     return user_lang[user_id]
+    cursor.execute("SELECT language FROM admin_page_app_language WHERE user_id=?", (user_id,))
     existing_user = cursor.fetchone()
     if existing_user:
-        user_lang[user_id] = existing_user[2]
+        print(existing_user[0])
+        user_lang[user_id] = existing_user[0]
         return user_lang
+    return None
+    # markup = types.InlineKeyboardMarkup()
+    # lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_rus')
+    # lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='lang_uz')
+    #
+    # markup.add(lang_rus, lang_uz)
+    # bot.send_message(message.chat.id, "Выберите язык 🌐\nTilni tanlang 🌐", reply_markup=markup)
 
-def user_language(message, lang):
-    if lang == 'rus':
-        markup = russian()
-        bot.send_message(message.chat.id,
-                         text='Обясняем команды:\n/log_into для верификации.                    .\n/add_proposal '
-                              'добавить заказ                   .\n/proposals посмотреть заказы                  '
-                              '      . \n'.format(
-                             message.from_user.first_name), reply_markup=markup)
-    elif lang == 'uz':
-        markup = uzbek()
-        bot.send_message(message.chat.id, "Komanda tanlen", reply_markup=markup)
-    else:
-        markup = types.InlineKeyboardMarkup()
-        lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_rus')
-        lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='lang_uz')
 
-        markup.add(lang_rus, lang_uz)
-        bot.send_message(message.chat.id, "Выберите язык 🌐\nTilni tanlang 🌐", reply_markup=markup)
+def user_language_req(message):
+    markup = types.InlineKeyboardMarkup()
+    lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_rus_onstart')
+    lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='lang_uz_onstart')
+
+    markup.add(lang_rus, lang_uz)
+    bot.send_message(message.chat.id, "Выберите язык 🌐\nTilni tanlang 🌐", reply_markup=markup)
 
 
 if __name__ == "__main__":
