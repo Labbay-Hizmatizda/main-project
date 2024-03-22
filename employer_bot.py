@@ -7,7 +7,7 @@ import requests
 from markup import *
 
 token = '6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8'
-bot = telebot.TeleBot('6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8')
+bot = telebot.TeleBot(token)
 user_lang = {}
 conn = sqlite3.connect('db.sqlite3', check_same_thread=False)
 cursor = conn.cursor()
@@ -26,9 +26,7 @@ def callback_query(call):
                           VALUES (?, ?)''', (call.from_user.id, 'rus'))
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text='Обясняем команды:\n/log_into для верификации.                    .\n/add_proposal '
-                                   'добавить заказ                   .\n/proposals посмотреть заказы                  '
-                                   '      . \n'.format(
+                              text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы'.format(
                                   call.from_user.first_name), reply_markup=markup)
         '''
             -Мои данные
@@ -39,13 +37,14 @@ def callback_query(call):
     elif call.data == 'my_account_rus':
         markup = my_account_rus()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Какое действие вы хотите сделать :", reply_markup=markup)
+                              text="Какое действие вы хотите сделать :......", reply_markup=markup)
     elif call.data == 'change_phone_num_rus':
         ...
     elif call.data == 'back':
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Вы в главном меню \nКакое действие вы хотите сделать :", reply_markup=markup)
+                              text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы'.format(
+                                  call.from_user.first_name), reply_markup=markup)
 
         '''
             -Заказы
@@ -68,7 +67,7 @@ def callback_query(call):
     elif call.data == 'back':
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Вы в главном меню \nКакое действие вы хотите сделать :z", reply_markup=markup)
+                              text="Вы в главном меню \nКакое действие вы хотите сделать :", reply_markup=markup)
 
     # --uzbek lang ---------------------------------------------------------------------------------------------
 
@@ -78,7 +77,7 @@ def callback_query(call):
                           VALUES (?, ?)''', (call.from_user.id, 'uz'))
         markup = uzbek()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text='Salom, {0}!'.format(call.from_user.first_name), reply_markup=markup)
+                              text="Glavni menu: \n     /log_into | tekshirish uchun.buyurtma qoshing\n     /add_orders | buyurtmalarni korish", reply_markup=markup)
 
     elif call.data == 'my_account_uz':
         markup = my_account_uz()
@@ -86,7 +85,7 @@ def callback_query(call):
                               text="Nima qmohchisiz:", reply_markup=markup)
     elif call.data == 'change_phone_num_uz':
         ...
-    elif call.data == 'back':
+    elif call.data == 'back_uz':
         markup = uzbek()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Glavni menyu \nNma qmohchisiz: ", reply_markup=markup)
@@ -415,19 +414,15 @@ def user_language_req(message, lang):
                               VALUES (?, ?)''', (user_id, 'rus'))
             markup = russian()
             bot.send_message(chat_id=user_id,
-                                  text='Обясняем команды:\n/log_into для верификации.                    .\n/add_proposal '
-                                       'добавить заказ                   .\n/proposals посмотреть заказы                  '
-                                       '      . \n', reply_markup=markup)
+                                  text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы'.format(
+                                  message.from_user.first_name), reply_markup=markup)
         elif lang[user_id] == 'uz':
             user_lang[message.from_user.id] = 'uz'
             cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
                               VALUES (?, ?)''', (message.from_user.id, 'uz'))
             markup = uzbek()
             bot.send_message(chat_id=message.chat.id,
-                                  text="""Biz buyruqlarni tushuntiramiz:\n/log_into tekshirish uchun.                    .\n/add_proposal '
-                                       'buyurtma qoshing .\n /proposals buyurtmalarni korish 
-                                       '      . \n""", reply_markup=markup)
-
+                                  text="Glavni menu: \n     /log_into | tekshirish uchun.buyurtma qoshing\n     /add_orders | buyurtmalarni korish", reply_markup=markup)
     else:
 
         markup = types.InlineKeyboardMarkup()
