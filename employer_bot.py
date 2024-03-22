@@ -28,12 +28,7 @@ def callback_query(call):
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы'.format(
                                   call.from_user.first_name), reply_markup=markup)
-        '''
-            -Мои данные
-                -Изменить номер
-                -Изменить пароль от аккаунта
-                -Назад
-        '''
+
     elif call.data == 'my_account_rus':
         markup = my_account_rus()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
@@ -46,12 +41,6 @@ def callback_query(call):
                               text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы'.format(
                                   call.from_user.first_name), reply_markup=markup)
 
-        '''
-            -Заказы
-                -активные заказы
-                -новые заказы
-                -назад
-        '''
     elif call.data == 'orders_rus':
         markup = orders_rus()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
@@ -90,7 +79,6 @@ def callback_query(call):
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Glavni menyu \nNma qmohchisiz: ", reply_markup=markup)
 
-
     elif call.data == 'orders_uz':
         markup = orders_uz()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
@@ -110,7 +98,6 @@ def callback_query(call):
 
 
 user_info = {}
-
 
 @bot.message_handler(commands=['potverdeniye_lichnosti', 'log_into', 'shaxsni_tasdiqlash'])
 def handle_services_worker(message):
