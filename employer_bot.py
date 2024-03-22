@@ -21,13 +21,13 @@ def start(message):
     salomlashish_rus = 'Привет, {}!'.format(message.from_user.first_name)
     lang = lang_identifier(message)
     print(lang)
-    if lang:
-        if lang[user_id] == 'rus':
-            bot.send_message(message.chat.id, salomlashish_rus)
-        elif lang[user_id] == 'uz':
-            bot.send_message(message.chat.id, salomlashish_uz)
-    else:
-        user_language_req(message)
+    # if lang:
+    #     if lang[user_id] == 'rus':
+    #         bot.send_message(message.chat.id, salomlashish_rus)
+    #     elif lang[user_id] == 'uz':
+    #         bot.send_message(message.chat.id, salomlashish_uz)
+    # else:
+    user_language_req(message)
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
@@ -434,8 +434,8 @@ def lang_identifier(message):
 
 def user_language_req(message):
     markup = types.InlineKeyboardMarkup()
-    lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_rus_onstart')
-    lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='lang_uz_onstart')
+    lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_rus')
+    lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='lang_uz')
 
     markup.add(lang_rus, lang_uz)
     bot.send_message(message.chat.id, "Выберите язык 🌐\nTilni tanlang 🌐", reply_markup=markup)
