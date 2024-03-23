@@ -17,8 +17,11 @@ def my_account_rus():
     markup = types.InlineKeyboardMarkup()
 
     change_phone_number = types.InlineKeyboardButton('Изменить номер', callback_data='change_phone_num_rus')
+    change_name_surname = types.InlineKeyboardButton('Изменить номер', callback_data='change_name_surname_rus')
+    change_language = types.InlineKeyboardButton('Изменить язык', callback_data='change_language_rus')
+    change_cv = types.InlineKeyboardButton('Изменить резюме', callback_data='change_cv_rus')
     back = types.InlineKeyboardButton('◀ Назад', callback_data='back')
-    markup.add(change_phone_number, back)
+    markup.add(change_name_surname, change_phone_number, change_cv, change_language, back)
     return markup
 
 def change_phone_num_rus():
