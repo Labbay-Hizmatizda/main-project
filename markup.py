@@ -1,5 +1,6 @@
 from telebot import types
 
+
 # employer--------------------------------------------------------------------------------------------------
 
 def russian():
@@ -20,9 +21,10 @@ def my_account_rus():
     change_name_surname = types.InlineKeyboardButton('Изменить номер', callback_data='change_name_surname_rus')
     change_language = types.InlineKeyboardButton('Изменить язык', callback_data='change_language_rus')
     change_cv = types.InlineKeyboardButton('Изменить резюме', callback_data='change_cv_rus')
-    back = types.InlineKeyboardButton('◀ Назад', callback_data='back')
+    back = types.InlineKeyboardButton('◀ Назад', callback_data='back_to_main_menu_rus')
     markup.add(change_name_surname, change_phone_number, change_cv, change_language, back)
     return markup
+
 
 def change_phone_num_rus():
     ...
@@ -32,11 +34,13 @@ def orders_rus():
     markup = types.InlineKeyboardMarkup()
 
     active_orders = types.InlineKeyboardButton('Активные заказы', callback_data='active_orders')
+    orders_history = types.InlineKeyboardButton('Активные заказы', callback_data='active_orders')
     new_order = types.InlineKeyboardButton('Создать новый заказ', callback_data='new_order')
-    back = types.InlineKeyboardButton('◀ Назад', callback_data='back')
-    markup.add(active_orders, new_order, back)
+    back = types.InlineKeyboardButton('◀ Назад', callback_data='back_to_main_menu_rus')
+    markup.add(active_orders, new_order, orders_history, back)
 
     return markup
+
 
 def active_orders_rus():
     markup = types.InlineKeyboardMarkup()
@@ -46,9 +50,9 @@ def active_orders_rus():
 
     return markup
 
+
 def new_order():
     ...
-
 
 
 # uzbek lang-------------------------------------------------------------------------------
@@ -63,6 +67,7 @@ def uzbek():
     markup.add(about_us, my_account, orders)
     return markup
 
+
 def my_account_uz():
     markup = types.InlineKeyboardMarkup()
 
@@ -70,6 +75,7 @@ def my_account_uz():
     back = types.InlineKeyboardButton('◀ Orqaga', callback_data='back_uz')
     markup.add(change_phone_number, back)
     return markup
+
 
 def change_number_uz():
     ...
@@ -85,6 +91,7 @@ def orders_uz():
 
     return markup
 
+
 def active_orders_uz():
     markup = types.InlineKeyboardMarkup()
 
@@ -93,14 +100,11 @@ def active_orders_uz():
 
     return markup
 
+
 def new_order_uz():
     ...
 
-
-
-
 # employee-------------------------------------------------------------------------------
-
 
 
 # def russian_employee():
