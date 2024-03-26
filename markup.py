@@ -4,7 +4,7 @@ from telebot import types
 # employer--------------------------------------------------------------------------------------------------
 
 def russian():
-    markup = types.InlineKeyboardMarkup()
+    markup = types.InlineKeyboardMarkup(row_width=1)
 
     about_us = types.InlineKeyboardButton('О нас', callback_data='about_us_rus')
     my_account = types.InlineKeyboardButton('Мои Данные', callback_data='my_account_rus')
@@ -15,7 +15,7 @@ def russian():
 
 
 def my_account_rus():
-    markup = types.InlineKeyboardMarkup()
+    markup = types.InlineKeyboardMarkup(row_width=1)
 
     change_phone_number = types.InlineKeyboardButton('Изменить номер', callback_data='change_phone_num_rus')
     change_name_surname = types.InlineKeyboardButton('Изменить имя фамилию', callback_data='change_name_surname_rus')
@@ -26,7 +26,7 @@ def my_account_rus():
     return markup
 
 def change_cv_info_rus():
-    markup = types.InlineKeyboardMarkup()
+    markup = types.InlineKeyboardMarkup(row_width=1)
     change_image = types.InlineKeyboardButton('Изменить Фото', callback_data='change_phone_num_rus')
     change_bio = types.InlineKeyboardButton('Изменить биографию', callback_data='change_name_surname_rus')
     markup.add(change_image, change_bio)
@@ -35,13 +35,13 @@ def change_phone_num_rus():
     ...
 
 def boolean_proposal_rus():
-    markup = types.InlineKeyboardMarkup()
+    markup = types.InlineKeyboardMarkup(row_width=1)
     yes = types.InlineKeyboardButton('Да', callback_data='yes_proposal')
     no = types.InlineKeyboardButton('Нет', callback_data='no_proposal')
     markup.add(yes, no)
 
 def orders_rus():
-    markup = types.InlineKeyboardMarkup()
+    markup = types.InlineKeyboardMarkup(row_width=1)
 
     active_orders = types.InlineKeyboardButton('Активные заказы', callback_data='active_orders')
     orders_history = types.InlineKeyboardButton('Активные заказы', callback_data='active_orders')
@@ -68,7 +68,7 @@ def new_order():
 # uzbek lang-------------------------------------------------------------------------------
 
 def uzbek():
-    markup = types.InlineKeyboardMarkup()
+    markup = types.InlineKeyboardMarkup(row_width=1)
 
     about_us = types.InlineKeyboardButton('Biz Haqimizda', callback_data='about_us_uz')
     my_account = types.InlineKeyboardButton('Mening danniylarim', callback_data='my_account_uz')
@@ -79,7 +79,7 @@ def uzbek():
 
 
 def my_account_uz():
-    markup = types.InlineKeyboardMarkup()
+    markup = types.InlineKeyboardMarkup(row_width=1)
 
     change_phone_number = types.InlineKeyboardButton('Nomerni o\'zgartirish', callback_data='change_phone_num_uz')
     back = types.InlineKeyboardButton('◀ Orqaga', callback_data='back_uz')
@@ -92,7 +92,7 @@ def change_number_uz():
 
 
 def orders_uz():
-    markup = types.InlineKeyboardMarkup()
+    markup = types.InlineKeyboardMarkup(row_width=1)
 
     active_orders = types.InlineKeyboardButton('Faol buyurtmalar', callback_data='active_orders_uz')
     new_order = types.InlineKeyboardButton('Yangi buyurtma yaratish', callback_data='new_order_uz')
@@ -103,7 +103,7 @@ def orders_uz():
 
 
 def active_orders_uz():
-    markup = types.InlineKeyboardMarkup()
+    markup = types.InlineKeyboardMarkup(row_width=1)
 
     back = types.InlineKeyboardButton('◀ Orqaga', callback_data='back_orders_uz')
     markup.add(back)
