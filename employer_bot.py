@@ -26,8 +26,7 @@ def callback_query(call):
                           VALUES (?, ?)''', (call.from_user.id, 'rus'))
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы'.format(
-                                  call.from_user.first_name), reply_markup=markup)
+                              text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы', reply_markup=markup)
 
     elif call.data == 'my_account_rus':
         markup = my_account_rus()
@@ -35,13 +34,13 @@ def callback_query(call):
                               text="Какое действие вы хотите сделать :......", reply_markup=markup)
     elif call.data == 'change_phone_num_rus':
         ...
-    elif call.data == 'back':
+    elif call.data == 'back_to_main_menu_rus':
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы'.format(
                                   call.from_user.first_name), reply_markup=markup)
 
-    elif call.data == 'orders_rus':
+    elif call.data == 'orders_rus' or call.data == 'back_orders':
         markup = orders_rus()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Заказы\nКакое действие вы хотите сделать :", reply_markup=markup)
@@ -49,14 +48,6 @@ def callback_query(call):
         markup = active_orders_rus()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Aктивные заказы\nКакое действие вы хотите сделать :", reply_markup=markup)
-    elif call.data == 'back_orders':
-        markup = orders_rus()
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Какое действие вы хотите сделать :", reply_markup=markup)
-    elif call.data == 'back':
-        markup = russian()
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Вы в главном меню \nКакое действие вы хотите сделать :", reply_markup=markup)
 
     # --uzbek lang ---------------------------------------------------------------------------------------------
 
