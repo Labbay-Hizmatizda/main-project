@@ -107,9 +107,6 @@ def handle_services_worker(message):
         bot.register_next_step_handler(message, check_handle_phone_number)
 
 
-from telebot.types import ReplyKeyboardRemove
-
-
 def check_handle_phone_number(message):
     user_id = message.from_user.id
     phone_number = message.contact.phone_number if message.contact else None
@@ -131,14 +128,14 @@ def handle_name(message):
 
 
 def handle_surname(message):
-    markup = types.InlineKeyboardMarkup(row_width=1)
-    passport = types.InlineKeyboardButton('Passport')
-    id = types.InlineKeyboardButton('ID')
-    markup.add(passport, id)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    passport = types.KeyboardButton('Passport')
+    id_button = types.KeyboardButton('ID')
+    markup.add(passport, id_button)
 
     user_id = message.from_user.id
     user_info[user_id]['surname'] = message.text
-    bot.send_message(user_id, "Выберите тип идентификатора", markup=markup)
+    bot.send_message(user_id, "Выберите тип идентификатора", reply_markup=markup)
     bot.register_next_step_handler(message, handle_choosing_identifier_type)
 
 
