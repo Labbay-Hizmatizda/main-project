@@ -3,7 +3,7 @@ from datetime import datetime
 import os
 import telebot
 import requests
-
+from telebot.types import ReplyKeyboardRemove
 from markup import *
 
 token = '6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8'
@@ -113,7 +113,7 @@ def check_handle_phone_number(message):
     user_info[user_id]['phone_number'] = phone_number
 
     if phone_number:
-        bot.send_message(user_id, "Введите ваше имя:")
+        bot.send_message(user_id, "Введите ваше имя:", reply_markup=ReplyKeyboardRemove())
         bot.register_next_step_handler(message, handle_name)
     else:
         bot.send_message(user_id, "Нажмите кнопку")
@@ -237,14 +237,30 @@ def handle_passport_image(message):
 
     os.makedirs(directory, exist_ok=True)
 
-    # Save images
-    for i, photo in enumerate(message.photo, start=1):
-        photo_file_id = photo.file_id
-        photo_path = os.path.join(directory, f"photo_{i}.jpg")
-        photo_file = bot.get_file(photo_file_id)
-        photo_file.download_file(photo_path)
+    # Save image
+    file_id = message.photo[2].file_id
+    photo_path = os.path.join(directory, "passport_image.jpg")
+    r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
+    if r.status_code == 200:
+        file_info = r.json()
+        file_path = file_info['result']['file_path']
+        photo_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+        response = requests.get(photo_url)
+        if response.status_code == 200:
+            with open(photo_path, 'wb') as f:
+                f.write(response.content)
+                bot.send_message(user_id,
+                                 "Image saved seccessfully. Wait a time to process your data.")
+        else:
+            ...
+    # Failed to download image
+    # Handle the error accordingly
+    else:
+        ...
+    # Failed to get file information
+    # Handle the error accordingly
 
-    # Call function to insert all user data
+    # Call function to insert user data for second ID image
     insert_all_user_data(message)
 
 
