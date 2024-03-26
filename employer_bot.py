@@ -90,7 +90,7 @@ def callback_query(call):
 
 user_info = {}
 
-@bot.message_handler(commands=['potverdeniye_lichnosti', 'log_into', 'shaxsni_tasdiqlash'])
+@bot.message_handler(commands=['kyc'])
 def handle_services_worker(message):
     user_id = message.from_user.id
     user_info[user_id] = {}
@@ -114,20 +114,13 @@ def check_handle_phone_number(message):
     user_id = message.from_user.id
     phone_number = message.contact.phone_number if message.contact else None
     user_info[user_id]['phone_number'] = phone_number
+
     if phone_number:
-        cursor.execute("SELECT * FROM admin_page_app_employer WHERE phone_number=?", (phone_number,))
-        existing_user = cursor.fetchone()
-
-        if existing_user:
-            # ToDo: sending sms in order to verify user
-            bot.send_message(user_id, "Добро пожаловать обратно!", reply_markup=ReplyKeyboardRemove())
-        else:
-            bot.send_message(user_id, "Yengi useraka, keyingi stepga otamiz", reply_markup=ReplyKeyboardRemove())
-            bot.send_message(user_id, "Введите ваше имя:")
-            bot.register_next_step_handler(message, handle_name)
+        bot.send_message(user_id, "Введите ваше имя:")
+        bot.register_next_step_handler(message, handle_name)
     else:
-        bot.send_message(user_id, "Invalid phone number. Please share your phone number again.")
-
+        bot.send_message(user_id, "Нажмите кнопку")
+        bot.register_next_step_handler(message, check_handle_phone_number)
 
 def handle_name(message):
     user_id = message.from_user.id
@@ -138,9 +131,14 @@ def handle_name(message):
 
 
 def handle_surname(message):
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    passport = types.InlineKeyboardButton('Passport')
+    id = types.InlineKeyboardButton('ID')
+    markup.add(passport, id)
+
     user_id = message.from_user.id
     user_info[user_id]['surname'] = message.text
-    bot.send_message(user_id, "Выберите тип идентификатора")
+    bot.send_message(user_id, "Выберите тип идентификатора", markup=markup)
     bot.register_next_step_handler(message, handle_choosing_identifier_type)
 
 
@@ -149,10 +147,10 @@ def handle_choosing_identifier_type(message):
     identifier_type = message.text
     user_info[user_id]['identifier_type'] = identifier_type
 
-    if identifier_type == "passport":
+    if identifier_type == "Passport":
         bot.send_message(user_id, "Пришлите изображение паспорта")
         bot.register_next_step_handler(message, handle_passport_image)
-    elif identifier_type == "id":
+    elif identifier_type == "ID":
         bot.send_message(user_id, "Пришлите изображения удостоверения личности")
         bot.register_next_step_handler(message, handle_id_image_first)
     else:
