@@ -222,7 +222,7 @@ def handle_id_image_second(message):
     # Handle the error accordingly
 
     # Call function to insert user data for second ID image
-    insert_all_user_data(message)
+    bot.register_next_step_handler(message, handle_cv_image)
 
 
 def handle_passport_image(message):
@@ -282,11 +282,12 @@ def handle_cv_image(message):
         else:
             bot.send_message(user_id,
                              "Failed to download image.")
-    bot.send_message(message, 'Напишите немного о себе....')
+    bot.send_message(user_id, 'Напишите немного о себе....')
     bot.register_next_step_handler(message, handle_cv_bio)
 
 def handle_cv_bio(message):
-    bot.
+    user_id = message.from_user.id
+    user_info[user_id]['bio'] = message.text
     insert_all_user_data(message)
     
 
@@ -299,6 +300,11 @@ def insert_all_user_data(message):
         "?, ?, ?, ?, ?)",
         (user_id, user_info[user_id]['name'], user_info[user_id]['surname'],
          user_info[user_id]['phone_number'], date_created))
+    conn.commit()
+
+    cursor.execute(
+        "INSERT INTO admin_page_app_cv (image, bio, rating, owner_id) VALUES (?, ?, ?, ?)",
+        ('media/cv/cv_image.jpg', user_info[user_id]['bio'], 0, user_id))
     conn.commit()
 
     bot.send_message(user_id,
