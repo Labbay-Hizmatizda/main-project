@@ -157,9 +157,7 @@ def handle_choosing_identifier_type(message):
 
 def handle_id_image_first(message):
     user_id = message.from_user.id
-    phone_number = user_info[user_id]['phone_number']
-
-    directory = os.path.join("media", "identifiers", str(phone_number))
+    directory = os.path.join("media", "identifiers", str(user_id))
 
     os.makedirs(directory, exist_ok=True)
 
@@ -196,9 +194,7 @@ def handle_id_image_first(message):
 
 def handle_id_image_second(message):
     user_id = message.from_user.id
-    phone_number = user_info[user_id]['phone_number']
-
-    directory = os.path.join("media", "identifiers", str(phone_number))
+    directory = os.path.join("media", "identifiers", str(user_id))
 
     os.makedirs(directory, exist_ok=True)
 
@@ -231,9 +227,7 @@ def handle_id_image_second(message):
 
 def handle_passport_image(message):
     user_id = message.from_user.id
-    phone_number = user_info[user_id]['phone_number']
-
-    directory = os.path.join("media", "identifiers", str(phone_number))
+    directory = os.path.join("media", "identifiers", str(user_id))
 
     os.makedirs(directory, exist_ok=True)
 
@@ -261,8 +255,40 @@ def handle_passport_image(message):
     # Handle the error accordingly
 
     # Call function to insert user data for second ID image
-    insert_all_user_data(message)
+    bot.register_next_step_handler(message, handle_cv_image)
 
+
+def handle_cv_image(message):
+    user_id = message.from_user.id
+    directory = os.path.join("media", "cv", str(user_id))
+
+    os.makedirs(directory, exist_ok=True)
+
+    # Save aimage
+    file_id = message.photo[2].file_id
+    photo_path = os.path.join(directory, "cv_image.jpg")
+    r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
+    if r.status_code == 200:
+        file_info = r.json()
+        file_path = file_info['result']['file_path']
+        photo_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+        response = requests.get(photo_url)
+        print(response.status_code)
+        if response.status_code == 200:
+            with open(photo_path, 'wb') as f:
+                f.write(response.content)
+                bot.send_message(user_id,
+                                 "Image saved seccessfully. Please send the second image of your ID.")
+        else:
+            bot.send_message(user_id,
+                             "Failed to download image.")
+    bot.send_message(message, 'Напишите немного о себе....')
+    bot.register_next_step_handler(message, handle_cv_bio)
+
+def handle_cv_bio(message):
+    bot.
+    insert_all_user_data(message)
+    
 
 def insert_all_user_data(message):
     user_id = message.from_user.id
@@ -307,8 +333,7 @@ def handle_description(message):
 
 def handle_image(message):
     user_id = message.from_user.id
-    # Assuming the image is uploaded and saved to some location
-    image_url = message.photo[-1].file_id  # You may need to adjust this based on how you handle images
+    image_url = message.photo[-1].file_id
     orders[user_id]['image'] = image_url
     bot.send_message(user_id, "Please enter the location.")
     bot.register_next_step_handler(message, handle_location)
@@ -377,8 +402,6 @@ def echo_all(message):
 
 def lang_identifier(message):
     user_id = message.from_user.id
-    # if user_lang[user_id] == 'uz' or user_lang[user_id] == 'rus':
-    #     return user_lang[user_id]
     cursor.execute("SELECT language FROM admin_page_app_language WHERE user_id=?", (user_id,))
     existing_user = cursor.fetchone()
     if existing_user:
@@ -386,12 +409,7 @@ def lang_identifier(message):
         user_lang[user_id] = existing_user[0]
         return user_lang
     return None
-    # markup = types.InlineKeyboardMarkup()
-    # lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_rus')
-    # lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='lang_uz')
-    #
-    # markup.add(lang_rus, lang_uz)
-    # bot.send_message(message.chat.id, "Выберите язык 🌐\nTilni tanlang 🌐", reply_markup=markup)
+
 
 
 def user_language_req(message, lang):
