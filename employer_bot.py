@@ -205,7 +205,7 @@ def handle_id_image_second(message):
             with open(photo_path, 'wb') as f:
                 f.write(response.content)
                 bot.send_message(user_id,
-                                 "Image saved seccessfully. Wait a time to process your data.")
+                                 "Image saved seccessfully. Send your personal photo.")
         else:
             ...
     # Failed to download image
@@ -238,7 +238,7 @@ def handle_passport_image(message):
             with open(photo_path, 'wb') as f:
                 f.write(response.content)
                 bot.send_message(user_id,
-                                 "Image saved seccessfully. Wait a time to process your data.")
+                                 "Image saved seccessfully. Send your personal photo.")
         else:
             ...
     # Failed to download image
@@ -271,9 +271,10 @@ def handle_cv_image(message):
             with open(photo_path, 'wb') as f:
                 f.write(response.content)
                 bot.send_message(user_id,
-                                 "Image saved seccessfully. Please send the second image of your ID.")
+                                 "Image saved seccessfully.")
         else:
             bot.send_message(user_id,
+                             
                              "Failed to download image.")
     bot.send_message(user_id, 'Напишите немного о себе....')
     bot.register_next_step_handler(message, handle_cv_bio)
