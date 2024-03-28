@@ -161,7 +161,6 @@ def handle_id_image_first(message):
 
     os.makedirs(directory, exist_ok=True)
 
-    # Save image
     file_id = message.photo[2].file_id
     photo_path = os.path.join(directory, "id_image_first.jpg")
     r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
@@ -180,15 +179,10 @@ def handle_id_image_first(message):
             bot.send_message(user_id,
                              "Failed to download image.")
             bot.register_next_step_handler(message, handle_id_image_first)
-
-    # Failed to download image
-    # Handle the error accordingly
     else:
         bot.send_message(user_id,
                          "Failed to get file information.")
         bot.register_next_step_handler(message, handle_id_image_first)
-    # Failed to get file information
-    # Handle the error accordingly
     bot.register_next_step_handler(message, handle_id_image_second)
 
 
@@ -264,7 +258,6 @@ def handle_cv_image(message):
 
     os.makedirs(directory, exist_ok=True)
 
-    # Save aimage
     file_id = message.photo[2].file_id
     photo_path = os.path.join(directory, "cv_image.jpg")
     r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
@@ -366,7 +359,6 @@ def handle_price(message):
     price = message.text
     orders[user_id]['price'] = price
 
-    # Save order to database
     order_data = orders[user_id]
     cursor.execute(
         "INSERT INTO admin_page_app_order (category, description, image, location, location_link, price, owner_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
