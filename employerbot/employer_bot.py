@@ -4,6 +4,9 @@ import os
 import telebot
 import requests
 from telebot.types import ReplyKeyboardRemove
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from markup import *
 
 token = '6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8'
@@ -17,6 +20,7 @@ chat_text = {}
 def start(message):
     lang = lang_identifier(message)
     user_language_req(message, lang)
+    
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
@@ -45,9 +49,22 @@ def callback_query(call):
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Заказы\nКакое действие вы хотите сделать :", reply_markup=markup)
     elif call.data == 'active_orders':
-        markup = active_orders_rus()
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Aктивные заказы\nКакое действие вы хотите сделать :", reply_markup=markup)
+        message = call.message
+        if hasattr(message, 'chat'):
+            user_id = message.chat.id
+            cursor.execute("SELECT * FROM admin_page_app_order WHERE owner_id=?", (user_id,))
+            orders = cursor.fetchall()
+
+            for order in orders:
+                markup = types.InlineKeyboardMarkup()
+                markup.add(types.InlineKeyboardButton(text='Edit', callback_data=f'edit_{order[0]}'),
+                           types.InlineKeyboardButton(text='Cancel', callback_data=f'cancel_{order[0]}'))
+                bot.send_message(user_id, f'ID : {order[0]}\nCategory : {order[1]}\nDescription : {order[2]}\nLocation : {order[4]}\nPrice : {order[5]}\nOwner_id : {order[6]}\n\n\nChoose an action:', reply_markup=markup)
+    elif call.data == 'new_order':
+        orders[call.from_user.id] = {}
+        bot.send_message(call.from_user.id, "Please enter the category.")
+        bot.register_next_step_handler(call.message, handle_category)
+
 
     # --uzbek lang ---------------------------------------------------------------------------------------------
 
