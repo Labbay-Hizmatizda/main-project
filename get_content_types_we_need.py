@@ -7,10 +7,10 @@ bot = telebot.TeleBot("6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8")
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    markup = ReplyKeyboardMarkup(resize_keyboard=True)
-    button = KeyboardButton('Отправить паспортные данные', request_poll=KeyboardButtonPollType(type="passport"))
-    markup.add(button)
-    bot.send_message(message.chat.id, "Нажмите на кнопку, чтобы отправить паспортные данные.", reply_markup=markup)
+    keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+    button_location = types.KeyboardButton(text="Отправить геолокацию", request_location=True)
+    keyboard.add(button_location)
+    bot.send_message(message.chat.id, "Нажмите кнопку, чтобы отправить геолокацию", reply_markup=keyboard)
 
 @bot.message_handler(content_types=['location'])
 def handle_location(message):
