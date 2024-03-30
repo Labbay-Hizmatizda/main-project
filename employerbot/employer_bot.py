@@ -48,7 +48,7 @@ def callback_query(call):
         markup = orders_rus()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Заказы\nКакое действие вы хотите сделать :", reply_markup=markup)
-    elif call.data == 'active_orders':
+    elif call.data == 'active_orders' or call.data == 'history_orders':
         message = call.message
         if hasattr(message, 'chat'):
             user_id = message.chat.id

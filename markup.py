@@ -44,7 +44,7 @@ def orders_rus():
     markup = types.InlineKeyboardMarkup(row_width=1)
 
     active_orders = types.InlineKeyboardButton('Активные заказы', callback_data='active_orders')
-    orders_history = types.InlineKeyboardButton('История заказов', callback_data='active_orders')
+    orders_history = types.InlineKeyboardButton('История заказов', callback_data='history_orders')
     new_order = types.InlineKeyboardButton('Создать новый заказ', callback_data='new_order')
     back = types.InlineKeyboardButton('◀ Назад', callback_data='back_to_main_menu_rus')
     markup.add(active_orders, new_order, orders_history, back)
