@@ -61,9 +61,7 @@ def callback_query(call):
                            types.InlineKeyboardButton(text='Cancel', callback_data=f'cancel_{order[0]}'))
                 bot.send_message(user_id, f'ID : {order[0]}\nCategory : {order[1]}\nDescription : {order[2]}\nLocation : {order[4]}\nPrice : {order[5]}\nOwner_id : {order[6]}\n\n\nChoose an action:', reply_markup=markup)
     elif call.data == 'new_order':
-        orders[call.from_user.id] = {}
-        bot.send_message(call.from_user.id, "Please enter the category.")
-        bot.register_next_step_handler(call.message, handle_category)
+        ...
 
 
     # --uzbek lang ---------------------------------------------------------------------------------------------
