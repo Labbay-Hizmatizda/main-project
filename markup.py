@@ -1,7 +1,7 @@
 from telebot import types
 
 
-# employer--------------------------------------------------------------------------------------------------
+# employer rus--------------------------------------------------------------------------------------------------
 
 def russian():
     markup = types.InlineKeyboardMarkup(row_width=1)
@@ -65,7 +65,7 @@ def new_order():
     ...
 
 
-# uzbek lang-------------------------------------------------------------------------------
+# employer uzbek-------------------------------------------------------------------------------
 
 def uzbek():
     markup = types.InlineKeyboardMarkup(row_width=1)
@@ -114,44 +114,45 @@ def active_orders_uz():
 def new_order_uz():
     ...
 
-# employee-------------------------------------------------------------------------------
+# employee rus-------------------------------------------------------------------------------
 
 
-# def russian_employee():
-#     markup = types.InlineKeyboardMarkup()
+def russian_employee():
+    markup = types.InlineKeyboardMarkup()
 
-#     about_us = types.InlineKeyboardButton('О нас', callback_data='about_us_rus')
-#     my_account = types.InlineKeyboardButton('Мои Данные', callback_data='my_account_rus')
-#     orders = types.InlineKeyboardButton('Заявки', callback_data='orders_rus')
+    about_us = types.InlineKeyboardButton('О нас', callback_data='about_us_rus')
+    my_account = types.InlineKeyboardButton('Мои Данные', callback_data='my_account_rus')
+    orders = types.InlineKeyboardButton('Заявки', callback_data='orders_rus')
 
-#     markup.add(about_us, my_account, orders)
-#     return markup
+    markup.add(about_us, my_account, orders)
+    return markup
 
-# def proposals_rus_employee():
-#     markup = types.InlineKeyboardMarkup()
+def proposals_rus_employee():
+    markup = types.InlineKeyboardMarkup()
 
-#     active_orders = types.InlineKeyboardButton('Активные Заявки', callback_data='active_orders')
-#     new_order = types.InlineKeyboardButton('Создать новый Заявку', callback_data='new_order')
-#     back = types.InlineKeyboardButton('◀ Назад', callback_data='back')
-#     markup.add(active_orders, new_order, back)
+    active_orders = types.InlineKeyboardButton('Активные Заявки', callback_data='active_orders')
+    new_order = types.InlineKeyboardButton('Создать новый Заявку', callback_data='new_order')
+    back = types.InlineKeyboardButton('◀ Назад', callback_data='back')
+    markup.add(active_orders, new_order, back)
 
-#     return markup
+    return markup
 
-# def active_orders_rus_employee():
-#     markup = types.InlineKeyboardMarkup()
+def active_orders_rus_employee():
+    markup = types.InlineKeyboardMarkup()
 
-#     back = types.InlineKeyboardButton('◀ Назад', callback_data='back_orders_employee')
-#     markup.add(back)
+    back = types.InlineKeyboardButton('◀ Назад', callback_data='back_orders_employee')
+    markup.add(back)
 
-#     return markup
+    return markup
 
+# employee uzbek-------------------------------------------------------------------------------
 
-# def uzbek_employee():
-#     markup = types.InlineKeyboardMarkup()
+def uzbek_employee():
+    markup = types.InlineKeyboardMarkup()
 
-#     about_us = types.InlineKeyboardButton('Biz Haqimizda', callback_data='about_us_uz')
-#     my_account = types.InlineKeyboardButton('Mening danniylarim', callback_data='my_info_uz')
-#     orders = types.InlineKeyboardButton('Buyurtlamarim', callback_data='orders_uz')
+    about_us = types.InlineKeyboardButton('Biz Haqimizda', callback_data='about_us_uz')
+    my_account = types.InlineKeyboardButton('Mening danniylarim', callback_data='my_info_uz')
+    orders = types.InlineKeyboardButton('Buyurtlamarim', callback_data='orders_uz')
 
-#     markup.add(about_us, my_account, orders)
-#     return markup
+    markup.add(about_us, my_account, orders)
+    return markup
