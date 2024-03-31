@@ -347,11 +347,14 @@ def handle_description(message):
 
 
 def handle_image(message):
-    user_id = message.from_user.id
-    image_url = message.photo[-1].file_id
-    orders[user_id]['image'] = image_url
-    bot.send_message(user_id, "Please enter the location.")
-    bot.register_next_step_handler(message, handle_location)
+    if message.content_type == 'photo':
+        user_id = message.from_user.id
+        image_url = message.photo[-1].file_id
+        orders[user_id]['image'] = image_url
+        bot.send_message(user_id, "Please enter the location.")
+        bot.register_next_step_handler(message, handle_location)
+    else:
+        handle_image(message)
 
 
 def handle_location(message):
