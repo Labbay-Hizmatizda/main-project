@@ -4,7 +4,7 @@ conn = sqlite3.connect('db.sqlite3')
 cursor = conn.cursor()
 
 # # очистить таблицу
-# cursor.execute("DELETE FROM admin_page_app_employer")
+cursor.execute("DELETE FROM admin_page_app_employer")
 
 # # удалить таблицу
 # cursor.execute('''DROP TABLE IF EXISTS admin_page_app_order''')
@@ -23,6 +23,5 @@ cursor = conn.cursor()
 #                     )''')
 
 
-# conn.commit()
-
+conn.commit()
 conn.close()
