@@ -129,7 +129,8 @@ def check_handle_phone_number(message):
 
     if phone_number:
         bot.send_message(user_id, "Введите ваше имя:", reply_markup=ReplyKeyboardRemove())
-        bot.register_next_step_handler(message, handle_name)
+        previous_message = message
+        bot.register_next_step_handler(message, previous_message, handle_name)
     else:
         bot.send_message(user_id, "Нажмите кнопку")
         bot.register_next_step_handler(message, check_handle_phone_number)
@@ -175,29 +176,39 @@ def handle_id_image_first(message):
     directory = os.path.join("media", "identifiers", str(user_id))
 
     os.makedirs(directory, exist_ok=True)
+    
+    file_id = message.photo[-1].file_id
+    file_info = bot.get_file(file_id)
+    file_path = file_info.file_path
+    downloaded_file = bot.download_file(file_path)
+    
 
-    file_id = message.photo[2].file_id
-    photo_path = os.path.join(directory, "id_image_first.jpg")
-    r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
-    if r.status_code == 200:
-        file_info = r.json()
-        file_path = file_info['result']['file_path']
-        photo_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
-        response = requests.get(photo_url)
-        print(response.status_code)
-        if response.status_code == 200:
-            with open(photo_path, 'wb') as f:
-                f.write(response.content)
-                bot.send_message(user_id,
-                                 "Image saved seccessfully. Please send the second image of your ID.")
-        else:
-            bot.send_message(user_id,
-                             "Failed to download image.")
-            bot.register_next_step_handler(message, handle_id_image_first)
-    else:
-        bot.send_message(user_id,
-                         "Failed to get file information.")
-        bot.register_next_step_handler(message, handle_id_image_first)
+    image_path = os.path.join(directory, 'id_image_first.jpg')
+    with open(image_path, 'wb') as photo:
+        photo.write(downloaded_file)
+
+    # file_id = message.photo[2].file_id
+    # photo_path = os.path.join(directory, "id_image_first.jpg")
+    # r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
+    # if r.status_code == 200:
+    #     file_info = r.json()
+    #     file_path = file_info['result']['file_path']
+    #     photo_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+    #     response = requests.get(photo_url)
+    #     print(response.status_code)
+    #     if response.status_code == 200:
+    #         with open(photo_path, 'wb') as f:
+    #             f.write(response.content)
+    #             bot.send_message(user_id,
+    #                              "Image saved seccessfully. Please send the second image of your ID.")
+    #     else:
+    #         bot.send_message(user_id,
+    #                          "Failed to download image.")
+    #         bot.register_next_step_handler(message, handle_id_image_first)
+    # else:
+    #     bot.send_message(user_id,
+    #                      "Failed to get file information.")
+    #     bot.register_next_step_handler(message, handle_id_image_first)
     bot.register_next_step_handler(message, handle_id_image_second)
 
 
@@ -206,31 +217,45 @@ def handle_id_image_second(message):
     directory = os.path.join("media", "identifiers", str(user_id))
 
     os.makedirs(directory, exist_ok=True)
+    
+    file_id = message.photo[-1].file_id
+    file_info = bot.get_file(file_id)
+    file_path = file_info.file_path
+    downloaded_file = bot.download_file(file_path)
+    
 
-    # Save image
-    file_id = message.photo[2].file_id
-    photo_path = os.path.join(directory, "id_image_second.jpg")
-    r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
-    if r.status_code == 200:
-        file_info = r.json()
-        file_path = file_info['result']['file_path']
-        photo_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
-        response = requests.get(photo_url)
-        if response.status_code == 200:
-            with open(photo_path, 'wb') as f:
-                f.write(response.content)
-                bot.send_message(user_id,
-                                 "Image saved seccessfully. Send your personal photo.")
-        else:
-            ...
-    # Failed to download image
-    # Handle the error accordingly
-    else:
-        ...
-    # Failed to get file information
-    # Handle the error accordingly
+    image_path = os.path.join(directory, 'id_image_second.jpg')
+    with open(image_path, 'wb') as photo:
+        photo.write(downloaded_file)
+#     user_id = message.from_user.id
+#     directory = os.path.join("media", "identifiers", str(user_id))
 
-    # Call function to insert user data for second ID image
+#     os.makedirs(directory, exist_ok=True)
+
+#     # Save image
+#     file_id = message.photo[2].file_id
+#     photo_path = os.path.join(directory, "id_image_second.jpg")
+#     r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
+#     if r.status_code == 200:
+#         file_info = r.json()
+#         file_path = file_info['result']['file_path']
+#         photo_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+#         response = requests.get(photo_url)
+#         if response.status_code == 200:
+#             with open(photo_path, 'wb') as f:
+#                 f.write(response.content)
+#                 bot.send_message(user_id,
+#                                  "Image saved seccessfully. Send your personal photo.")
+#         else:
+#             ...
+#     # Failed to download image
+#     # Handle the error accordingly
+#     else:
+#         ...
+#     # Failed to get file information
+#     # Handle the error accordingly
+
+#     # Call function to insert user data for second ID image
     bot.register_next_step_handler(message, handle_cv_image)
 
 
@@ -239,59 +264,87 @@ def handle_passport_image(message):
     directory = os.path.join("media", "identifiers", str(user_id))
 
     os.makedirs(directory, exist_ok=True)
+    
+    file_id = message.photo[-1].file_id
+    file_info = bot.get_file(file_id)
+    file_path = file_info.file_path
+    downloaded_file = bot.download_file(file_path)
+    
 
-    # Save image
-    file_id = message.photo[2].file_id
-    photo_path = os.path.join(directory, "passport_image.jpg")
-    r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
-    if r.status_code == 200:
-        file_info = r.json()
-        file_path = file_info['result']['file_path']
-        photo_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
-        response = requests.get(photo_url)
-        if response.status_code == 200:
-            with open(photo_path, 'wb') as f:
-                f.write(response.content)
-                bot.send_message(user_id,
-                                 "Image saved seccessfully. Send your personal photo.")
-        else:
-            ...
-    # Failed to download image
-    # Handle the error accordingly
-    else:
-        ...
-    # Failed to get file information
-    # Handle the error accordingly
+    image_path = os.path.join(directory, 'passport_image.jpg')
+    with open(image_path, 'wb') as photo:
+        photo.write(downloaded_file)
+    # user_id = message.from_user.id
+    # directory = os.path.join("media", "identifiers", str(user_id))
 
-    # Call function to insert user data for second ID image
+    # os.makedirs(directory, exist_ok=True)
+
+    # # Save image
+    # file_id = message.photo[2].file_id
+    # photo_path = os.path.join(directory, "passport_image.jpg")
+    # r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
+    # if r.status_code == 200:
+    #     file_info = r.json()
+    #     file_path = file_info['result']['file_path']
+    #     photo_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+    #     response = requests.get(photo_url)
+    #     if response.status_code == 200:
+    #         with open(photo_path, 'wb') as f:
+    #             f.write(response.content)
+    #             bot.send_message(user_id,
+    #                              "Image saved seccessfully. Send your personal photo.")
+    #     else:
+    #         ...
+    # # Failed to download image
+    # # Handle the error accordingly
+    # else:
+    #     ...
+    # # Failed to get file information
+    # # Handle the error accordingly
+
+    # # Call function to insert user data for second ID image
     bot.register_next_step_handler(message, handle_cv_image)
 
 
 def handle_cv_image(message):
     user_id = message.from_user.id
-    directory = os.path.join("media", "cv", str(user_id))
+    directory = os.path.join("media", "identifiers", str(user_id))
 
     os.makedirs(directory, exist_ok=True)
+    
+    file_id = message.photo[-1].file_id
+    file_info = bot.get_file(file_id)
+    file_path = file_info.file_path
+    downloaded_file = bot.download_file(file_path)
+    
 
-    file_id = message.photo[2].file_id
-    photo_path = os.path.join(directory, "cv_image.jpg")
-    r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
-    if r.status_code == 200:
-        file_info = r.json()
-        file_path = file_info['result']['file_path']
-        photo_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
-        response = requests.get(photo_url)
-        print(response.status_code)
-        if response.status_code == 200:
-            with open(photo_path, 'wb') as f:
-                f.write(response.content)
-                bot.send_message(user_id,
-                                 "Image saved seccessfully.")
-        else:
-            bot.send_message(user_id,
+    image_path = os.path.join(directory, 'cv_image.jpg')
+    with open(image_path, 'wb') as photo:
+        photo.write(downloaded_file)
+    # user_id = message.from_user.id
+    # directory = os.path.join("media", "cv", str(user_id))
+
+    # os.makedirs(directory, exist_ok=True)
+
+    # file_id = message.photo[2].file_id
+    # photo_path = os.path.join(directory, "cv_image.jpg")
+    # r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
+    # if r.status_code == 200:
+    #     file_info = r.json()
+    #     file_path = file_info['result']['file_path']
+    #     photo_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+    #     response = requests.get(photo_url)
+    #     print(response.status_code)
+    #     if response.status_code == 200:
+    #         with open(photo_path, 'wb') as f:
+    #             f.write(response.content)
+    #             bot.send_message(user_id,
+    #                              "Image saved seccessfully.")
+    #     else:
+    #         bot.send_message(user_id,
                              
-                             "Failed to download image.")
-    bot.send_message(user_id, 'Напишите немного о себе....')
+    #                          "Failed to download image.")
+    # bot.send_message(user_id, 'Напишите немного о себе....')
     bot.register_next_step_handler(message, handle_cv_bio)
 
 def handle_cv_bio(message):
