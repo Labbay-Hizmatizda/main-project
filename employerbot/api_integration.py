@@ -1,79 +1,65 @@
 import requests
-BASE_URL = "http://127.0.0.1:8000/api/employers/?user_id=456"
 
-# def get_employers():
-#     response = requests.get(f'{BASE_URL}employers')
-#     if response.status_code == 200:
-#         employers = response.json()  
-#         return employers
-#     else:
-#         print("Error while fetching categories:", response.status_code)
-#         return []
+BASE_URL = "http://127.0.0.1:8000/api/"
 
 
-# def post_employers():
-
-# data = {
-#     'owner_id': f"{owner_id}",
-#     'category': 1,
-#     'description': 'Test description',
-#     'media': 'test.jpg',
-#     'location': 'Test location',
-#     'location_link': 'https://example.com',
-#     'price': 100.00,
-#     'is_active': True
-# }
-
-
+def get_employers():
+    response = requests.get(f'{BASE_URL}employers/')
+    if response.status_code == 200:
+        return [{'Status_code': response.status_code,
+                        'Json': response.json()}]
+    else:
+        return [{'Status_code': response.status_code,
+                        'Json': response.json()}]
 # print(get_employers())
+    
+
+def post_employers():
+    data = {
+        'user_id': 698569,
+        'name': 'Test1',
+        'surname': 'TEST1',
+        'phone_number': '+987675956',
+    }
+    response = requests.post(f'{BASE_URL}employers/', json=data)
+    if response.status_code == 200:
+        return [{'Status_code': response.status_code,
+                        'Json': response.json()}]   
+    else:
+        return [{'Status_code': response.status_code,
+                        'Json': response.json()}]
+# print(post_employers())
+
+
+def patch_employers():
+    data = {
+        'user_id': 3097,
+    }
+
+    response = requests.patch('http://127.0.0.1:8000/api/employers/4/', json=data)
+    if response.status_code == 200:
+        return [{'Status_code': response.status_code,
+                        'Json': response.json()}]
+    else:
+        return [{'Status_code': response.status_code,
+                        'Json': response.json()}]
+
+# print(patch_employers())
 
 
 
 
-data = {
-    'surname': 'Updated',  # Здесь можно указать любые поля, которые вы хотите обновить
-}
-response = requests.patch(BASE_URL, json=data)
-
-print(response.status_code)
-print(response.json())
 
 
 
 
+''' Template for outputing any information
 
+if response.status_code == 200:
+        return [{'Status_code': response.status_code,
+                        'Json': response.json()}]
+    else:
+        return [{'Status_code': response.status_code,
+                        'Json': response.json()}]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""
-url = 'http://127.0.0.1:8000/api/orders/'
-
-data = {
-    'owner_id': 1,
-    'category': 1,
-    'description': 'Test description',
-    'media': 'test.jpg',
-    'location': 'Test location',
-    'location_link': 'https://example.com',
-    'price': 100.00,
-    'is_active': True
-}
-
-response = requests.post(url, json=data)
-
-print(response.status_code)
-print(response.json())
-"""
+'''
