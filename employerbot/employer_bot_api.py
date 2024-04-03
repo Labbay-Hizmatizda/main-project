@@ -25,8 +25,8 @@ def start(message):
 def callback_query(call):
     if call.data == 'lang_rus':
         user_lang[call.from_user.id] = 'rus'
-        cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
-                          VALUES (?, ?)''', (call.from_user.id, 'rus'))
+        # cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
+        #                   VALUES (?, ?)''', (call.from_user.id, 'rus'))
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы', reply_markup=markup)
@@ -51,8 +51,8 @@ def callback_query(call):
         message = call.message
         if hasattr(message, 'chat'):
             user_id = message.chat.id
-            cursor.execute("SELECT * FROM admin_page_app_order WHERE owner_id=?", (user_id,))
-            orders = cursor.fetchall()
+            # cursor.execute("SELECT * FROM admin_page_app_order WHERE owner_id=?", (user_id,))
+            # orders = cursor.fetchall()
 
             for order in orders:
                 markup = types.InlineKeyboardMarkup()
@@ -67,8 +67,8 @@ def callback_query(call):
 
     if call.data == 'lang_uz':
         user_lang[call.from_user.id] = 'uz'
-        cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
-                          VALUES (?, ?)''', (call.from_user.id, 'uz'))
+        # cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
+        #                   VALUES (?, ?)''', (call.from_user.id, 'uz'))
         markup = uzbek()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Glavni menu: \n     /log_into | tekshirish uchun.buyurtma qoshing\n     /add_orders | buyurtmalarni korish", reply_markup=markup)
@@ -346,8 +346,8 @@ def handle_price(message):
 @bot.message_handler(commands=['orders'])
 def list_orders(message):
     user_id = message.chat.id
-    cursor.execute("SELECT * FROM admin_page_app_order WHERE owner_id=?", (user_id,))
-    orders = cursor.fetchall()
+    # cursor.execute("SELECT * FROM admin_page_app_order WHERE owner_id=?", (user_id,))
+    # orders = cursor.fetchall()
 
     for order in orders:
         markup = types.InlineKeyboardMarkup()
@@ -374,13 +374,13 @@ def echo_all(message):
 
 def lang_identifier(message):
     user_id = message.from_user.id
-    cursor.execute("SELECT language FROM admin_page_app_language WHERE user_id=?", (user_id,))
-    existing_user = cursor.fetchone()
-    if existing_user:
-        print(existing_user[0])
-        user_lang[user_id] = existing_user[0]
-        return user_lang
-    return None
+    # cursor.execute("SELECT language FROM admin_page_app_language WHERE user_id=?", (user_id,))
+    # existing_user = cursor.fetchone()
+    # if existing_user:
+    #     print(existing_user[0])
+    #     user_lang[user_id] = existing_user[0]
+    #     return user_lang
+    # return None
 
 
 
@@ -389,16 +389,16 @@ def user_language_req(message, lang):
     if lang:
         if lang[user_id] == 'rus':
             user_lang[user_id] = 'rus'
-            cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
-                              VALUES (?, ?)''', (user_id, 'rus'))
+            # cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
+            #                   VALUES (?, ?)''', (user_id, 'rus'))
             markup = russian()
             bot.send_message(chat_id=user_id,
                                   text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы'.format(
                                   message.from_user.first_name), reply_markup=markup)
         elif lang[user_id] == 'uz':
             user_lang[message.from_user.id] = 'uz'
-            cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
-                              VALUES (?, ?)''', (message.from_user.id, 'uz'))
+            # cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
+            #                   VALUES (?, ?)''', (message.from_user.id, 'uz'))
             markup = uzbek()
             bot.send_message(chat_id=message.chat.id,
                                   text="Glavni menu: \n     /log_into | tekshirish uchun.buyurtma qoshing\n     /add_orders | buyurtmalarni korish", reply_markup=markup)
