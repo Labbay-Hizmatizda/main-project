@@ -3,23 +3,27 @@ import requests
 BASE_URL = "http://127.0.0.1:8000/api/"
 
 
-def get_employers():
-    response = requests.get(f'{BASE_URL}employers/')
+def get_employer(user_id):
+    response = requests.get(f'{BASE_URL}employers/?user_id={user_id}')
     if response.status_code == 200:
-        return [{'Status_code': response.status_code,
+        if response.json() == []:
+            return False
+        else:
+            return [{'Status_code': response.status_code,
                         'Json': response.json()}]
     else:
-        return [{'Status_code': response.status_code,
-                        'Json': response.json()}]
-# print(get_employers())
+        # return [{'Status_code': response.status_code,
+        #                 'Json': response.json()}]
+        return None
+# print(get_employer(1))
     
 
-def post_employers():
+def post_employer(user_id, name, surname, phone_number):
     data = {
-        'user_id': 698569,
-        'name': 'Test1',
-        'surname': 'TEST1',
-        'phone_number': '+987675956',
+        'user_id': user_id,
+        'name': name,
+        'surname': surname,
+        'phone_number': phone_number,
     }
     response = requests.post(f'{BASE_URL}employers/', json=data)
     if response.status_code == 200:
@@ -28,7 +32,7 @@ def post_employers():
     else:
         return [{'Status_code': response.status_code,
                         'Json': response.json()}]
-# print(post_employers())
+# print(post_employer())
 
 
 def patch_employers():
@@ -47,8 +51,23 @@ def patch_employers():
 # print(patch_employers())
 
 
+def post_cv(bio, owner_id):
+    data = {
+        'media': 'media/cv/cv_image.jpg',
+        'bio': bio,
+        'rating': 0,
+        'owner_id': owner_id,
+    }
+    response = requests.post(f'{BASE_URL}cvs/', json=data)
+    if response.status_code == 200:
+        return [{'Status_code': response.status_code,
+                        'Json': response.json()}]   
+    else:
+        print('sv')
+        return [{'Status_code': response.status_code,
+                        'Json': response.json()}]
+    
 
- 
 
 
 
