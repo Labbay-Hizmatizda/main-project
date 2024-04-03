@@ -339,7 +339,7 @@ def handle_price(message):
     #      order_data['location_link'], order_data['price'], user_id)
     # )
     # conn.commit()
-    print(post_orders(order_data['category'], order_data['description'], order_data['image'], order_data['location'], order_data['location_link'], order_data['price'], user_id))
+    print(post_order(order_data['category'], order_data['description'], order_data['image'], order_data['location'], order_data['location_link'], order_data['price'], user_id))
     bot.send_message(user_id, "Order added successfully!, /orders to see your order")
 
 

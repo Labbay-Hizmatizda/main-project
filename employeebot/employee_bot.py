@@ -17,9 +17,12 @@ user_lang = {}
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    lang = lang_identifier(message)
-    user_language_req(message, lang)
+    markup = types.InlineKeyboardMarkup()
+    lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_rus')
+    lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='lang_uz')
 
+    markup.add(lang_rus, lang_uz)
+    bot.send_message(message.chat.id, "Выберите язык 🌐\nTilni tanlang 🌐", reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
