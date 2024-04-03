@@ -7,6 +7,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from markup import *
 from api_integration import *
+from api_integration import *
 
 # Creating the bot object
 bot = telebot.TeleBot('6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8')
@@ -54,8 +55,7 @@ def callback_query(call):
         message = call.message
         if hasattr(message, 'chat'):
             user_id = message.chat.id
-            # cursor.execute("SELECT * FROM admin_page_app_order WHERE owner_id=?", (user_id,))
-            # orders = cursor.fetchall()
+            
 
             for order in orders:
                 markup = types.InlineKeyboardMarkup()

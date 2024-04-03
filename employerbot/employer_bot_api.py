@@ -44,15 +44,20 @@ def callback_query(call):
                                   call.from_user.first_name), reply_markup=markup)
 
     elif call.data == 'orders_rus' or call.data == 'back_orders':
-        markup = orders_rus()
+        user_id = call.from_user.id
+        ans = get_employer_order(user_id) 
+               
+        text = ""
+        for order in ans:
+            text += f"ID : {order['id']}\nDescription : {order['description']}\nMedia : {order['media']}\nLocation : {order['location']}\nLocation Link : {order['location_link']}\nPrice : {order['price']}\nCategory : {order['category']}\n\n\n"
+
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Заказы\nКакое действие вы хотите сделать :", reply_markup=markup)
+                        text=f'{text}\n\n\n\bЗаказы \n\bКакое действие вы хотите сделать :')
     elif call.data == 'active_orders' or call.data == 'history_orders':
         message = call.message
         if hasattr(message, 'chat'):
             user_id = message.chat.id
-            # cursor.execute("SELECT * FROM admin_page_app_order WHERE owner_id=?", (user_id,))
-            # orders = cursor.fetchall()
+            
 
             for order in orders:
                 markup = types.InlineKeyboardMarkup()
@@ -339,7 +344,8 @@ def handle_price(message):
     #      order_data['location_link'], order_data['price'], user_id)
     # )
     # conn.commit()
-    print(post_order(order_data['category'], order_data['description'], order_data['image'], order_data['location'], order_data['location_link'], order_data['price'], user_id))
+
+    # print(post_order(order_data['category'], order_data['description'], order_data['image'], order_data['location'], order_data['location_link'], order_data['price'], user_id))
     bot.send_message(user_id, "Order added successfully!, /orders to see your order")
 
 
@@ -386,6 +392,7 @@ def lang_identifier(message):
 
 def user_language_req(message, lang):
     user_id = message.chat.id
+    print(message.from_user.id)
     if lang:
         if lang[user_id] == 'rus':
             user_lang[user_id] = 'rus'
