@@ -33,12 +33,20 @@ def callback_query(call):
         #                   VALUES (?, ?)''', (call.from_user.id, 'rus'))
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы', reply_markup=markup)
+                              text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы\n\n\n', reply_markup=markup)
 
     elif call.data == 'my_account_rus':
+        user_id = call.from_user.id
+
         markup = my_account_rus()
+        response = get_employee(user_id)
+        text = f'''
+User ID : {response[0]['user_id']}
+Имя : {response[0]['name']}
+Фамилия : {response[0]['surname']}
+Телефон номера : {response[0]['phone_number']}\n\n'''
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Какое действие вы хотите сделать :......", reply_markup=markup)
+                              text=f"{text}Какое действие вы хотите сделать :......", reply_markup=markup)
     elif call.data == 'change_phone_num_rus':
         ...
     elif call.data == 'back_to_main_menu_rus':
@@ -47,24 +55,25 @@ def callback_query(call):
                               text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы'.format(
                                   call.from_user.first_name), reply_markup=markup)
 
-    elif call.data == 'orders_rus' or call.data == 'back_orders':
-        markup = orders_rus()
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text="Заказы\nКакое действие вы хотите сделать :", reply_markup=markup)
-    elif call.data == 'active_orders' or call.data == 'history_orders':
+    elif call.data == 'proposals_rus' or call.data == 'back_orders':
+        markup = proposals_rus()
+        user_id = call.from_user.id
+
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text='Какое действие вы хотите сделать :', reply_markup=markup)
+    elif call.data == 'pending_proposals' or call.data == 'history_proposals':
+        message = call.message
+        markup = pending_proposals_rus()
+        if hasattr(message, 'chat'):
+            user_id = message.chat.id
+            bot.send_message(user_id, '........', reply_markup=markup)
+            # bot.send_message(user_id, f'ID : {order[0]}\nCategory : {order[1]}\nDescription : {order[2]}\nLocation : {order[4]}\nPrice : {order[5]}\nOwner_id : {order[6]}\n\n\nChoose an action:', reply_markup=markup)
+    elif call.data == 'new_proposal':
         message = call.message
         if hasattr(message, 'chat'):
             user_id = message.chat.id
             
 
-            for order in orders:
-                markup = types.InlineKeyboardMarkup()
-                markup.add(types.InlineKeyboardButton(text='Edit', callback_data=f'edit_{order[0]}'),
-                           types.InlineKeyboardButton(text='Cancel', callback_data=f'cancel_{order[0]}'))
-                bot.send_message(user_id, f'ID : {order[0]}\nCategory : {order[1]}\nDescription : {order[2]}\nLocation : {order[4]}\nPrice : {order[5]}\nOwner_id : {order[6]}\n\n\nChoose an action:', reply_markup=markup)
-    elif call.data == 'new_order':
-        ...
-
+        
 
     # --uzbek lang ---------------------------------------------------------------------------------------------
 
@@ -103,3 +112,67 @@ def callback_query(call):
         markup = uzbek()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Glavni menyu \nNma qmohchisiz: ", reply_markup=markup)
+
+
+
+
+
+
+
+
+
+
+orders = {}
+message_ids = {}
+
+@bot.message_handler(commands=['add_order'])
+def handle_add_order(message):
+    def handle_category(message):
+        def handle_description(message):
+            user_id = message.from_user.id
+            description = message.text
+            orders[user_id]['description'] = description
+            
+            # Отправка сообщения с просьбой загрузить изображение
+            sent_message = bot.send_message(user_id, "Please upload an image of your order.")
+            # Сохраняем ID отправленного сообщения и ID сообщения пользователя
+            message_ids[user_id].append(sent_message.message_id)
+            message_ids[user_id].append(message.id)
+            print(message_ids[message.from_user.id])
+            clear_messages(message.from_user.id)
+            
+            
+            # bot.register_next_step_handler(message, handle_image)
+        
+        user_id = message.from_user.id
+        category = message.text
+        orders[user_id]['category'] = category
+        
+        # Отправка сообщения с просьбой ввести описание заказа
+        sent_message = bot.send_message(user_id, "Please enter the description of your order.")
+        # Сохраняем ID отправленного сообщения и ID сообщения пользователя
+        message_ids[user_id].append(sent_message.message_id)
+        message_ids[user_id].append(message.id)
+        
+        bot.register_next_step_handler(message, handle_description)
+    
+    orders[message.from_user.id] = {}
+    message_ids[message.from_user.id] = []
+    
+    sent_message = bot.send_message(message.from_user.id, "Please enter the category.")
+    message_ids[message.from_user.id].append(sent_message.message_id)
+    message_ids[message.from_user.id].append(message.message_id)
+    
+    bot.register_next_step_handler(message, handle_category)
+
+
+# После завершения процесса обработки заказа удалите все сообщения их списка по user_id
+def clear_messages(user_id):
+    for msg_id in message_ids[user_id]:
+        bot.delete_message(user_id, msg_id)
+    del message_ids[user_id]
+
+
+
+print('\n.', '.', '.\n')
+bot.polling(none_stop=True)

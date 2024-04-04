@@ -1,32 +1,33 @@
+import sqlite3
 from datetime import datetime
 import os
 import telebot
+import requests
 from telebot.types import ReplyKeyboardRemove
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from employerbot.markup import *
-from api_integration import *
-
-# Creating the bot object
-bot = telebot.TeleBot('6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8')
 
 token = '6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8'
 bot = telebot.TeleBot(token)
 user_lang = {}
+conn = sqlite3.connect('db.sqlite3', check_same_thread=False)
+cursor = conn.cursor()
+chat_text = {}
 
 @bot.message_handler(commands=['start'])
 def start(message):
     lang = lang_identifier(message)
     user_language_req(message, lang)
-
+    
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     if call.data == 'lang_rus':
         user_lang[call.from_user.id] = 'rus'
-        # cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
-        #                   VALUES (?, ?)''', (call.from_user.id, 'rus'))
+        cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
+                          VALUES (?, ?)''', (call.from_user.id, 'rus'))
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы', reply_markup=markup)
@@ -44,20 +45,15 @@ def callback_query(call):
                                   call.from_user.first_name), reply_markup=markup)
 
     elif call.data == 'orders_rus' or call.data == 'back_orders':
-        user_id = call.from_user.id
-        ans = get_employer_order(user_id) 
-               
-        text = ""
-        for order in ans:
-            text += f"ID : {order['id']}\nDescription : {order['description']}\nMedia : {order['media']}\nLocation : {order['location']}\nLocation Link : {order['location_link']}\nPrice : {order['price']}\nCategory : {order['category']}\n\n\n"
-
+        markup = orders_rus()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                        text=f'{text}\n\n\n\bЗаказы \n\bКакое действие вы хотите сделать :')
+                              text="Заказы\nКакое действие вы хотите сделать :", reply_markup=markup)
     elif call.data == 'active_orders' or call.data == 'history_orders':
         message = call.message
         if hasattr(message, 'chat'):
             user_id = message.chat.id
-            
+            cursor.execute("SELECT * FROM admin_page_app_order WHERE owner_id=?", (user_id,))
+            orders = cursor.fetchall()
 
             for order in orders:
                 markup = types.InlineKeyboardMarkup()
@@ -72,8 +68,8 @@ def callback_query(call):
 
     if call.data == 'lang_uz':
         user_lang[call.from_user.id] = 'uz'
-        # cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
-        #                   VALUES (?, ?)''', (call.from_user.id, 'uz'))
+        cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
+                          VALUES (?, ?)''', (call.from_user.id, 'uz'))
         markup = uzbek()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Glavni menu: \n     /log_into | tekshirish uchun.buyurtma qoshing\n     /add_orders | buyurtmalarni korish", reply_markup=markup)
@@ -114,10 +110,8 @@ def handle_services_worker(message):
     user_id = message.from_user.id
     user_info[user_id] = {}
 
-    # cursor.execute("SELECT * FROM admin_page_app_employer WHERE user_id=?", (user_id,))
-    # existing_user = cursor.fetchone()
-    existing_user = get_employer(user_id)
-    print(existing_user)
+    cursor.execute("SELECT * FROM admin_page_app_employer WHERE user_id=?", (user_id,))
+    existing_user = cursor.fetchone()
     if existing_user:
         bot.send_message(user_id, "Добро пожаловать обратно! tipa oldin reg qilib login qibogan")
     else:
@@ -135,7 +129,8 @@ def check_handle_phone_number(message):
 
     if phone_number:
         bot.send_message(user_id, "Введите ваше имя:", reply_markup=ReplyKeyboardRemove())
-        bot.register_next_step_handler(message, handle_name)
+        previous_message = message
+        bot.register_next_step_handler(message, previous_message, handle_name)
     else:
         bot.send_message(user_id, "Нажмите кнопку")
         bot.register_next_step_handler(message, check_handle_phone_number)
@@ -191,7 +186,29 @@ def handle_id_image_first(message):
     image_path = os.path.join(directory, 'id_image_first.jpg')
     with open(image_path, 'wb') as photo:
         photo.write(downloaded_file)
-    bot.send_message(user_id,"First ID Image are saved seccessfully. send your second ID photo")
+
+    # file_id = message.photo[2].file_id
+    # photo_path = os.path.join(directory, "id_image_first.jpg")
+    # r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
+    # if r.status_code == 200:
+    #     file_info = r.json()
+    #     file_path = file_info['result']['file_path']
+    #     photo_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+    #     response = requests.get(photo_url)
+    #     print(response.status_code)
+    #     if response.status_code == 200:
+    #         with open(photo_path, 'wb') as f:
+    #             f.write(response.content)
+    #             bot.send_message(user_id,
+    #                              "Image saved seccessfully. Please send the second image of your ID.")
+    #     else:
+    #         bot.send_message(user_id,
+    #                          "Failed to download image.")
+    #         bot.register_next_step_handler(message, handle_id_image_first)
+    # else:
+    #     bot.send_message(user_id,
+    #                      "Failed to get file information.")
+    #     bot.register_next_step_handler(message, handle_id_image_first)
     bot.register_next_step_handler(message, handle_id_image_second)
 
 
@@ -210,7 +227,35 @@ def handle_id_image_second(message):
     image_path = os.path.join(directory, 'id_image_second.jpg')
     with open(image_path, 'wb') as photo:
         photo.write(downloaded_file)
-    bot.send_message(user_id,"ID Images are saved seccessfully. send your personal photo")
+#     user_id = message.from_user.id
+#     directory = os.path.join("media", "identifiers", str(user_id))
+
+#     os.makedirs(directory, exist_ok=True)
+
+#     # Save image
+#     file_id = message.photo[2].file_id
+#     photo_path = os.path.join(directory, "id_image_second.jpg")
+#     r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
+#     if r.status_code == 200:
+#         file_info = r.json()
+#         file_path = file_info['result']['file_path']
+#         photo_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+#         response = requests.get(photo_url)
+#         if response.status_code == 200:
+#             with open(photo_path, 'wb') as f:
+#                 f.write(response.content)
+#                 bot.send_message(user_id,
+#                                  "Image saved seccessfully. Send your personal photo.")
+#         else:
+#             ...
+#     # Failed to download image
+#     # Handle the error accordingly
+#     else:
+#         ...
+#     # Failed to get file information
+#     # Handle the error accordingly
+
+#     # Call function to insert user data for second ID image
     bot.register_next_step_handler(message, handle_cv_image)
 
 
@@ -229,7 +274,35 @@ def handle_passport_image(message):
     image_path = os.path.join(directory, 'passport_image.jpg')
     with open(image_path, 'wb') as photo:
         photo.write(downloaded_file)
-        bot.send_message(user_id,"Passport Image saved seccessfully. send your personal photo")
+    # user_id = message.from_user.id
+    # directory = os.path.join("media", "identifiers", str(user_id))
+
+    # os.makedirs(directory, exist_ok=True)
+
+    # # Save image
+    # file_id = message.photo[2].file_id
+    # photo_path = os.path.join(directory, "passport_image.jpg")
+    # r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
+    # if r.status_code == 200:
+    #     file_info = r.json()
+    #     file_path = file_info['result']['file_path']
+    #     photo_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+    #     response = requests.get(photo_url)
+    #     if response.status_code == 200:
+    #         with open(photo_path, 'wb') as f:
+    #             f.write(response.content)
+    #             bot.send_message(user_id,
+    #                              "Image saved seccessfully. Send your personal photo.")
+    #     else:
+    #         ...
+    # # Failed to download image
+    # # Handle the error accordingly
+    # else:
+    #     ...
+    # # Failed to get file information
+    # # Handle the error accordingly
+
+    # # Call function to insert user data for second ID image
     bot.register_next_step_handler(message, handle_cv_image)
 
 
@@ -248,8 +321,30 @@ def handle_cv_image(message):
     image_path = os.path.join(directory, 'cv_image.jpg')
     with open(image_path, 'wb') as photo:
         photo.write(downloaded_file)
-    bot.send_message(user_id,"Image saved seccessfully.")
-    bot.send_message(user_id, 'Напишите немного о себе....')
+    # user_id = message.from_user.id
+    # directory = os.path.join("media", "cv", str(user_id))
+
+    # os.makedirs(directory, exist_ok=True)
+
+    # file_id = message.photo[2].file_id
+    # photo_path = os.path.join(directory, "cv_image.jpg")
+    # r = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
+    # if r.status_code == 200:
+    #     file_info = r.json()
+    #     file_path = file_info['result']['file_path']
+    #     photo_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+    #     response = requests.get(photo_url)
+    #     print(response.status_code)
+    #     if response.status_code == 200:
+    #         with open(photo_path, 'wb') as f:
+    #             f.write(response.content)
+    #             bot.send_message(user_id,
+    #                              "Image saved seccessfully.")
+    #     else:
+    #         bot.send_message(user_id,
+                             
+    #                          "Failed to download image.")
+    # bot.send_message(user_id, 'Напишите немного о себе....')
     bot.register_next_step_handler(message, handle_cv_bio)
 
 def handle_cv_bio(message):
@@ -261,22 +356,21 @@ def handle_cv_bio(message):
 def insert_all_user_data(message):
     user_id = message.from_user.id
 
-    
-    # cursor.execute(
-    #     "INSERT INTO admin_page_app_employer (user_id, name, surname, phone_number, date_created) VALUES ("
-    #     "?, ?, ?, ?, ?)",
-    #     (user_id, user_info[user_id]['name'], user_info[user_id]['surname'],
-    #      user_info[user_id]['phone_number'], date_created))
-    # conn.commit()
-    post_employer(user_id, user_info[user_id]['name'], user_info[user_id]['surname'], user_info[user_id]['phone_number'])
+    date_created = datetime.now()
+    cursor.execute(
+        "INSERT INTO admin_page_app_employer (user_id, name, surname, phone_number, date_created) VALUES ("
+        "?, ?, ?, ?, ?)",
+        (user_id, user_info[user_id]['name'], user_info[user_id]['surname'],
+         user_info[user_id]['phone_number'], date_created))
+    conn.commit()
 
-    # cursor.execute(
-    #     "INSERT INTO admin_page_app_cv (image, bio, rating, owner_id) VALUES (?, ?, ?, ?)",
-    #     ('media/cv/cv_image.jpg', user_info[user_id]['bio'], 0, user_id))
-    # conn.commit()
-    # print(post_cv(user_info[user_id]['bio'], user_id))
+    cursor.execute(
+        "INSERT INTO admin_page_app_cv (image, bio, rating, owner_id) VALUES (?, ?, ?, ?)",
+        ('media/cv/cv_image.jpg', user_info[user_id]['bio'], 0, user_id))
+    conn.commit()
 
-    bot.send_message(user_id, "Отлично! Теперь вы можете использовать команду /jobs для просмотра доступных действий.")
+    bot.send_message(user_id,
+                     "Отлично! Теперь вы можете использовать команду /jobs для просмотра доступных действий.")
 
 
 orders = {}
@@ -338,22 +432,20 @@ def handle_price(message):
     orders[user_id]['price'] = price
 
     order_data = orders[user_id]
-    # cursor.execute(
-    #     "INSERT INTO admin_page_app_order (category, description, image, location, location_link, price, owner_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    #     (order_data['category'], order_data['description'], order_data['image'], order_data['location'],
-    #      order_data['location_link'], order_data['price'], user_id)
-    # )
-    # conn.commit()
-
-    # print(post_order(order_data['category'], order_data['description'], order_data['image'], order_data['location'], order_data['location_link'], order_data['price'], user_id))
+    cursor.execute(
+        "INSERT INTO admin_page_app_order (category, description, image, location, location_link, price, owner_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (order_data['category'], order_data['description'], order_data['image'], order_data['location'],
+         order_data['location_link'], order_data['price'], user_id)
+    )
+    conn.commit()
     bot.send_message(user_id, "Order added successfully!, /orders to see your order")
 
 
 @bot.message_handler(commands=['orders'])
 def list_orders(message):
     user_id = message.chat.id
-    # cursor.execute("SELECT * FROM admin_page_app_order WHERE owner_id=?", (user_id,))
-    # orders = cursor.fetchall()
+    cursor.execute("SELECT * FROM admin_page_app_order WHERE owner_id=?", (user_id,))
+    orders = cursor.fetchall()
 
     for order in orders:
         markup = types.InlineKeyboardMarkup()
@@ -380,32 +472,31 @@ def echo_all(message):
 
 def lang_identifier(message):
     user_id = message.from_user.id
-    # cursor.execute("SELECT language FROM admin_page_app_language WHERE user_id=?", (user_id,))
-    # existing_user = cursor.fetchone()
-    # if existing_user:
-    #     print(existing_user[0])
-    #     user_lang[user_id] = existing_user[0]
-    #     return user_lang
-    # return None
+    cursor.execute("SELECT language FROM admin_page_app_language WHERE user_id=?", (user_id,))
+    existing_user = cursor.fetchone()
+    if existing_user:
+        print(existing_user[0])
+        user_lang[user_id] = existing_user[0]
+        return user_lang
+    return None
 
 
 
 def user_language_req(message, lang):
     user_id = message.chat.id
-    print(message.from_user.id)
     if lang:
         if lang[user_id] == 'rus':
             user_lang[user_id] = 'rus'
-            # cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
-            #                   VALUES (?, ?)''', (user_id, 'rus'))
+            cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
+                              VALUES (?, ?)''', (user_id, 'rus'))
             markup = russian()
             bot.send_message(chat_id=user_id,
                                   text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы'.format(
                                   message.from_user.first_name), reply_markup=markup)
         elif lang[user_id] == 'uz':
             user_lang[message.from_user.id] = 'uz'
-            # cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
-            #                   VALUES (?, ?)''', (message.from_user.id, 'uz'))
+            cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
+                              VALUES (?, ?)''', (message.from_user.id, 'uz'))
             markup = uzbek()
             bot.send_message(chat_id=message.chat.id,
                                   text="Glavni menu: \n     /log_into | tekshirish uchun.buyurtma qoshing\n     /add_orders | buyurtmalarni korish", reply_markup=markup)

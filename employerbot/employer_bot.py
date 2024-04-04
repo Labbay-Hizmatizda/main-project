@@ -7,7 +7,7 @@ from telebot.types import ReplyKeyboardRemove
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from markup import *
+from employerbot.markup import *
 
 token = '6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8'
 bot = telebot.TeleBot(token)
@@ -374,48 +374,94 @@ def insert_all_user_data(message):
 
 
 orders = {}
-
+message_ids = {}
 
 @bot.message_handler(commands=['add_order'])
 def handle_add_order(message):
+    def handle_category(message):
+        def handle_description(message):
+            user_id = message.from_user.id
+            description = message.text
+            orders[user_id]['description'] = description
+            
+            # Отправка сообщения с просьбой загрузить изображение
+            sent_message = bot.send_message(user_id, "Please upload an image of your order.")
+            # Сохраняем ID отправленного сообщения и ID сообщения пользователя
+            message_ids[user_id].append(sent_message.message_id)
+            message_ids[user_id].append(message.id)
+            print(message_ids[message.from_user.id])
+            clear_messages(message.from_user.id)
+            
+            
+            # bot.register_next_step_handler(message, handle_image)
+        
+        user_id = message.from_user.id
+        category = message.text
+        orders[user_id]['category'] = category
+        
+        # Отправка сообщения с просьбой ввести описание заказа
+        sent_message = bot.send_message(user_id, "Please enter the description of your order.")
+        # Сохраняем ID отправленного сообщения и ID сообщения пользователя
+        message_ids[user_id].append(sent_message.message_id)
+        message_ids[user_id].append(message.id)
+        
+        bot.register_next_step_handler(message, handle_description)
+    
     orders[message.from_user.id] = {}
-    bot.send_message(message.from_user.id, "Please enter the category.")
+    message_ids[message.from_user.id] = []
+    
+    sent_message = bot.send_message(message.from_user.id, "Please enter the category.")
+    message_ids[message.from_user.id].append(sent_message.message_id)
+    message_ids[message.from_user.id].append(message.message_id)
+    
     bot.register_next_step_handler(message, handle_category)
 
 
-def handle_category(message):
-    user_id = message.from_user.id
-    category = message.text
-    orders[user_id]['category'] = category
-    bot.send_message(user_id, "Please enter the description of your order.")
-    bot.register_next_step_handler(message, handle_description)
+# После завершения процесса обработки заказа удалите все сообщения их списка по user_id
+def clear_messages(user_id):
+    for msg_id in message_ids[user_id]:
+        bot.delete_message(user_id, msg_id)
+    del message_ids[user_id]
 
 
-def handle_description(message):
-    user_id = message.from_user.id
-    description = message.text
-    orders[user_id]['description'] = description
-    bot.send_message(user_id, "Please upload an image of your order.")
-    bot.register_next_step_handler(message, handle_image)
 
 
-def handle_image(message):
-    if message.content_type == 'photo':
-        user_id = message.from_user.id
-        image_url = message.photo[-1].file_id
-        orders[user_id]['image'] = image_url
-        bot.send_message(user_id, "Please enter the location.")
-        bot.register_next_step_handler(message, handle_location)
-    else:
-        handle_image(message)
 
 
-def handle_location(message):
-    user_id = message.from_user.id
-    location = message.text
-    orders[user_id]['location'] = location
-    bot.send_message(user_id, "Please enter the location link.")
-    bot.register_next_step_handler(message, handle_location_link)
+
+# def handle_category(message):
+#     user_id = message.from_user.id
+#     category = message.text
+#     orders[user_id]['category'] = category
+#     bot.send_message(user_id, "Please enter the description of your order.")
+#     bot.register_next_step_handler(message, handle_description)
+
+
+# def handle_description(message):
+#     user_id = message.from_user.id
+#     description = message.text
+#     orders[user_id]['description'] = description
+#     bot.send_message(user_id, "Please upload an image of your order.")
+#     bot.register_next_step_handler(message, handle_image)
+
+
+# def handle_image(message):
+#     if message.content_type == 'photo':
+#         user_id = message.from_user.id
+#         image_url = message.photo[-1].file_id
+#         orders[user_id]['image'] = image_url
+#         bot.send_message(user_id, "Please enter the location.")
+#         bot.register_next_step_handler(message, handle_location)
+#     else:
+#         handle_image(message)
+
+
+# def handle_location(message):
+#     user_id = message.from_user.id
+#     location = message.text
+#     orders[user_id]['location'] = location
+#     bot.send_message(user_id, "Please enter the location link.")
+#     bot.register_next_step_handler(message, handle_location_link)
 
 
 def handle_location_link(message):
@@ -431,13 +477,13 @@ def handle_price(message):
     price = message.text
     orders[user_id]['price'] = price
 
-    order_data = orders[user_id]
-    cursor.execute(
-        "INSERT INTO admin_page_app_order (category, description, image, location, location_link, price, owner_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        (order_data['category'], order_data['description'], order_data['image'], order_data['location'],
-         order_data['location_link'], order_data['price'], user_id)
-    )
-    conn.commit()
+    # order_data = orders[user_id]
+    # cursor.execute(
+    #     "INSERT INTO admin_page_app_order (category, description, image, location, location_link, price, owner_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    #     (order_data['category'], order_data['description'], order_data['image'], order_data['location'],
+    #      order_data['location_link'], order_data['price'], user_id)
+    # )
+    # conn.commit()
     bot.send_message(user_id, "Order added successfully!, /orders to see your order")
 
 
