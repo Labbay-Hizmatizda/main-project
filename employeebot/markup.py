@@ -13,6 +13,13 @@ def russian():
     markup.add(about_us, my_account, orders)
     return markup
 
+def back_about_us():
+    markup = types.InlineKeyboardMarkup()
+
+    back = types.InlineKeyboardButton('◀ Назад', callback_data='about_us_back_menu')
+    markup.add(back)
+
+    return markup
 
 def my_account_rus():
     markup = types.InlineKeyboardMarkup(row_width=1)
