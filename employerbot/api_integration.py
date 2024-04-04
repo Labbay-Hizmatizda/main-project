@@ -14,7 +14,7 @@ def get_employer(user_id):
         # return [{'Status_code': response.status_code,
         #                 'Json': response.json()}]
         return None
-print(get_employer(1231138963), '\n')                                          # @shahriorovv_a - USER_ID = 1231138963 
+# print(get_employer(1231138963), '\n')                                          # @shahriorovv_a - USER_ID = 1231138963 
     
 
 def get_employer_order(user_id):
@@ -75,9 +75,29 @@ def post_cv(bio, owner_id):
                         'Json': response.json()}]
     
 
+def lang_patch(user_id, lang):
+    data = {
+        'language': lang,
+    }
+
+    response = requests.get(f'{BASE_URL}employers/?user_id={user_id}')
+    if response.status_code == 200:
+        employers = response.json()
+        if employers:  # Check if there are any employers returned
+            employer_id = employers[0]['id']  # Assuming there's only one employer per user, change accordingly if not
+            out_json = requests.patch(f'{BASE_URL}employers/{employer_id}/', json=data)
+            if out_json.status_code == 200:
+                return out_json.json()
+            else:
+                return [{'Status_code': out_json.status_code,
+                         'Json': out_json.json()}]
+        else:
+            return [{'Error': 'No employer found for the given user_id'}]
+    else:
+        return [{'Error': f'Request failed with status code: {response.status_code}'}]
 
 
-
+print(lang_patch(1, 2))
 
 ''' Template for outputing any information
 
