@@ -279,20 +279,31 @@ def insert_all_user_data(message):
 
 
 orders = {}
+deletion = []
 
 
 @bot.message_handler(commands=['add_order'])
 def handle_add_order(message):
     orders[message.from_user.id] = {}
-    bot.send_message(message.from_user.id, "Please enter the category.")
+    deletion.append(message.id)
+    sent_message = bot.send_message(message.from_user.id, "Please enter the category.")
+    deletion.append(sent_message.id)
     bot.register_next_step_handler(message, handle_category)
 
 
 def handle_category(message):
     user_id = message.from_user.id
+    deletion.append(message.id)
     category = message.text
     orders[user_id]['category'] = category
-    bot.send_message(user_id, "Please enter the description of your order.")
+    for msg_id in deletion:
+        try:
+            bot.delete_message(user_id, msg_id)
+        except Exception as e:
+            print(f"Error deleting message {msg_id}: {e}")
+    deletion.clear()
+    sent_message = bot.send_message(user_id, "Please enter the description of your order.")
+    deletion.append(sent_message.id)
     bot.register_next_step_handler(message, handle_description)
 
 
@@ -300,16 +311,32 @@ def handle_description(message):
     user_id = message.from_user.id
     description = message.text
     orders[user_id]['description'] = description
-    bot.send_message(user_id, "Please upload an image of your order.")
+    deletion.append(message.id)
+    for msg_id in deletion:
+        try:
+            bot.delete_message(user_id, msg_id)
+        except Exception as e:
+            print(f"Error deleting message {msg_id}: {e}")
+    deletion.clear()
+    sent_message = bot.send_message(user_id, "Please upload an image of your order.")
+    deletion.append(sent_message.id)
     bot.register_next_step_handler(message, handle_image)
 
 
 def handle_image(message):
     if message.content_type == 'photo':
         user_id = message.from_user.id
+        deletion.append(message.id)
         image_url = message.photo[-1].file_id
         orders[user_id]['image'] = image_url
-        bot.send_message(user_id, "Please enter the location.")
+        for msg_id in deletion:
+            try:
+                bot.delete_message(user_id, msg_id)
+            except Exception as e:
+                print(f"Error deleting message {msg_id}: {e}")
+        deletion.clear()
+        sent_message = bot.send_message(user_id, "Please enter the location.")
+        deletion.append(sent_message.id)
         bot.register_next_step_handler(message, handle_location)
     else:
         handle_image(message)
@@ -317,34 +344,51 @@ def handle_image(message):
 
 def handle_location(message):
     user_id = message.from_user.id
+    deletion.append(message.id)
     location = message.text
     orders[user_id]['location'] = location
-    bot.send_message(user_id, "Please enter the location link.")
+    for msg_id in deletion:
+        try:
+            bot.delete_message(user_id, msg_id)
+        except Exception as e:
+            print(f"Error deleting message {msg_id}: {e}")
+    deletion.clear()
+    sent_message = bot.send_message(user_id, "Please enter the location link.")
+    deletion.append(sent_message.id)
     bot.register_next_step_handler(message, handle_location_link)
 
 
 def handle_location_link(message):
     user_id = message.from_user.id
+    deletion.append(message.id)
     location_link = message.text
     orders[user_id]['location_link'] = location_link
-    bot.send_message(user_id, "Please enter the price.")
+    for msg_id in deletion:
+        try:
+            bot.delete_message(user_id, msg_id)
+        except Exception as e:
+            print(f"Error deleting message {msg_id}: {e}")
+    deletion.clear()
+    sent_message = bot.send_message(user_id, "Please enter the price.")
+    deletion.append(sent_message.id)
     bot.register_next_step_handler(message, handle_price)
 
 
 def handle_price(message):
     user_id = message.from_user.id
+    deletion.append(message.id)
     price = message.text
     orders[user_id]['price'] = price
 
     order_data = orders[user_id]
-    # cursor.execute(
-    #     "INSERT INTO admin_page_app_order (category, description, image, location, location_link, price, owner_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    #     (order_data['category'], order_data['description'], order_data['image'], order_data['location'],
-    #      order_data['location_link'], order_data['price'], user_id)
-    # )
-    # conn.commit()
 
     # print(post_order(order_data['category'], order_data['description'], order_data['image'], order_data['location'], order_data['location_link'], order_data['price'], user_id))
+    for msg_id in deletion:
+        try:
+            bot.delete_message(user_id, msg_id)
+        except Exception as e:
+            print(f"Error deleting message {msg_id}: {e}")
+    deletion.clear()
     bot.send_message(user_id, "Order added successfully!, /orders to see your order")
 
 
