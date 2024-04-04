@@ -8,9 +8,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from employerbot.markup import *
 from api_integration import *
 
-# Creating the bot object
-bot = telebot.TeleBot('6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8')
-
 token = '6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8'
 bot = telebot.TeleBot(token)
 user_lang = {}
@@ -47,11 +44,12 @@ def callback_query(call):
         user_id = call.from_user.id
         ans = get_employer_order(user_id) 
         text = ""
+        markup = orders_rus()
         for order in ans:
             text += f"ID : {order['id']}\nDescription : {order['description']}\nMedia : {order['media']}\nLocation : {order['location']}\nLocation Link : {order['location_link']}\nPrice : {order['price']}\nCategory : {order['category']}\n\n\n"
 
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                        text=f'{text}\n\n\n\bЗаказы \n\bКакое действие вы хотите сделать :')
+                        text=f'{text}\n\n\n\bЗаказы \n\bКакое действие вы хотите сделать :', reply_markup=markup)
     elif call.data == 'active_orders' or call.data == 'history_orders':
         message = call.message
         if hasattr(message, 'chat'):
@@ -65,6 +63,8 @@ def callback_query(call):
                 bot.send_message(user_id, f'ID : {order[0]}\nCategory : {order[1]}\nDescription : {order[2]}\nLocation : {order[4]}\nPrice : {order[5]}\nOwner_id : {order[6]}\n\n\nChoose an action:', reply_markup=markup)
     elif call.data == 'new_order':
         ...
+            
+
 
 
     # --uzbek lang ---------------------------------------------------------------------------------------------
