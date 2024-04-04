@@ -35,6 +35,10 @@ def callback_query(call):
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы\n\n\n', reply_markup=markup)
 
+    elif call.data == 'about_us_rus':
+        markup = types.InlineKeyboardMarkup()
+        markup.add(types.InlineKeyboardButton(text='Наш сайт', url='https://youtube.com'))
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Наш сайт ⇣", reply_markup=markup)
     elif call.data == 'my_account_rus':
         user_id = call.from_user.id
 
@@ -47,26 +51,30 @@ User ID : {response[0]['user_id']}
 Телефон номера : {response[0]['phone_number']}\n\n'''
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text=f"{text}Какое действие вы хотите сделать :......", reply_markup=markup)
-    elif call.data == 'change_phone_num_rus':
-        ...
     elif call.data == 'back_to_main_menu_rus':
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы'.format(
                                   call.from_user.first_name), reply_markup=markup)
 
-    elif call.data == 'proposals_rus' or call.data == 'back_orders':
+    elif call.data == 'proposals_rus' or call.data == 'back_orders' or call.data == 'back_proposals':
         markup = proposals_rus()
         user_id = call.from_user.id
-
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text='Какое действие вы хотите сделать :', reply_markup=markup)
-    elif call.data == 'pending_proposals' or call.data == 'history_proposals':
+    elif call.data == 'pending_proposals':
         message = call.message
         markup = pending_proposals_rus()
-        if hasattr(message, 'chat'):
-            user_id = message.chat.id
-            bot.send_message(user_id, '........', reply_markup=markup)
-            # bot.send_message(user_id, f'ID : {order[0]}\nCategory : {order[1]}\nDescription : {order[2]}\nLocation : {order[4]}\nPrice : {order[5]}\nOwner_id : {order[6]}\n\n\nChoose an action:', reply_markup=markup)
+        user_id = call.from_user.id
+
+        response = get_proposals(user_id)
+        text = ""
+        for proposals in response:
+            text += f"ID : {proposals['id']}\nOwner_id : {proposals['owner_id']}\nOrder_id : {proposals['order_id']}\nPrice : {proposals['price']}\n\n"
+
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text=f'{text}', reply_markup=markup)    
+    
+    elif call.data == 'proposals_history':
+        ...
     elif call.data == 'new_proposal':
         message = call.message
         if hasattr(message, 'chat'):
@@ -89,13 +97,10 @@ User ID : {response[0]['user_id']}
         markup = my_account_uz()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Nima qmohchisiz:", reply_markup=markup)
-    elif call.data == 'change_phone_num_uz':
-        ...
     elif call.data == 'back_uz':
         markup = uzbek()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Glavni menyu \nNma qmohchisiz: ", reply_markup=markup)
-
     elif call.data == 'orders_uz':
         markup = orders_uz()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
@@ -133,9 +138,7 @@ def handle_add_order(message):
             description = message.text
             orders[user_id]['description'] = description
             
-            # Отправка сообщения с просьбой загрузить изображение
             sent_message = bot.send_message(user_id, "Please upload an image of your order.")
-            # Сохраняем ID отправленного сообщения и ID сообщения пользователя
             message_ids[user_id].append(sent_message.message_id)
             message_ids[user_id].append(message.id)
             print(message_ids[message.from_user.id])
@@ -148,9 +151,7 @@ def handle_add_order(message):
         category = message.text
         orders[user_id]['category'] = category
         
-        # Отправка сообщения с просьбой ввести описание заказа
         sent_message = bot.send_message(user_id, "Please enter the description of your order.")
-        # Сохраняем ID отправленного сообщения и ID сообщения пользователя
         message_ids[user_id].append(sent_message.message_id)
         message_ids[user_id].append(message.id)
         
@@ -166,7 +167,6 @@ def handle_add_order(message):
     bot.register_next_step_handler(message, handle_category)
 
 
-# После завершения процесса обработки заказа удалите все сообщения их списка по user_id
 def clear_messages(user_id):
     for msg_id in message_ids[user_id]:
         bot.delete_message(user_id, msg_id)

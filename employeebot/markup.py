@@ -41,10 +41,10 @@ def proposals_rus():
     markup = types.InlineKeyboardMarkup(row_width=1)
 
     active_orders = types.InlineKeyboardButton('Отлики в ожидании', callback_data='pending_proposals')
-    orders_history = types.InlineKeyboardButton('История заказов', callback_data='proposals_history')
+    proposals_history = types.InlineKeyboardButton('История откликов', callback_data='proposals_history')
     new_order = types.InlineKeyboardButton('Откликнуться на заказ', callback_data='new_proposal')
     back = types.InlineKeyboardButton('◀ Назад', callback_data='back_to_main_menu_rus')
-    markup.add(active_orders, new_order, orders_history, back)
+    markup.add(active_orders, new_order, proposals_history, back)
 
     return markup
 

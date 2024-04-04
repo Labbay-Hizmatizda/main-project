@@ -27,16 +27,13 @@ def get_categories():
         return response.json()
 
 
-def get_employer_order(user_id):
-    get_id_from = requests.get(f'{BASE_URL}employers/?user_id={user_id}')
+def get_proposals(user_id):
+    get_id_from = requests.get(f'{BASE_URL}employees/?user_id={user_id}')
     id = get_id_from.json()
     id_value = id[0]['id']
-    response = requests.get(f'{BASE_URL}orders/?owner_id={id_value}')
+    response = requests.get(f'{BASE_URL}proposals/?owner_id={id_value}')
     if response.status_code == 200:
-        if response.json() == []:
-            return None
-        else:
-            return response.json()
+        return response.json()
 
 
 def get_lang(user_id):
