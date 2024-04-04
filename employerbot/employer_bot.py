@@ -391,7 +391,10 @@ def handle_add_order(message):
             message_ids[user_id].append(message.id)
             print(message_ids[message.from_user.id])
             clear_messages(message.from_user.id)
-            
+            markup = russian()
+            bot.send_message(message.chat.id,
+                              'Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы\n\n\n', reply_markup=markup)
+
             
             # bot.register_next_step_handler(message, handle_image)
         
