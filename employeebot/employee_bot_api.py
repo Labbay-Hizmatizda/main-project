@@ -12,10 +12,7 @@ from api_integration import *
 # Creating the bot object
 bot = telebot.TeleBot('6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8')
 
-token = '6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8'
-bot = telebot.TeleBot(token)
 user_lang = {}
-
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.InlineKeyboardMarkup()
@@ -79,7 +76,7 @@ User ID : {response[0]['user_id']}
         message = call.message
         if hasattr(message, 'chat'):
             user_id = message.chat.id
-            
+
             
         
 

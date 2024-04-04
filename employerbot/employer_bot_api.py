@@ -46,7 +46,6 @@ def callback_query(call):
     elif call.data == 'orders_rus' or call.data == 'back_orders':
         user_id = call.from_user.id
         ans = get_employer_order(user_id) 
-               
         text = ""
         for order in ans:
             text += f"ID : {order['id']}\nDescription : {order['description']}\nMedia : {order['media']}\nLocation : {order['location']}\nLocation Link : {order['location_link']}\nPrice : {order['price']}\nCategory : {order['category']}\n\n\n"
@@ -97,7 +96,7 @@ def callback_query(call):
         markup = active_orders_uz()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Aktivni Zakazla\nNma qmohchisiz: ", reply_markup=markup)
-    elif call.data == 'back_orders_uz':
+    elif call.data == 'пback_orders_uz':
         markup = orders_uz()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Nma qmohchisiz: ", reply_markup=markup)
