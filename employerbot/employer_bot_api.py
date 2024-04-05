@@ -11,6 +11,7 @@ from api_integration import *
 token = '6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8'
 bot = telebot.TeleBot(token)
 user_lang = {}
+deletion = []
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -62,7 +63,13 @@ def callback_query(call):
                            types.InlineKeyboardButton(text='Cancel', callback_data=f'cancel_{order[0]}'))
                 bot.send_message(user_id, f'ID : {order[0]}\nCategory : {order[1]}\nDescription : {order[2]}\nLocation : {order[4]}\nPrice : {order[5]}\nOwner_id : {order[6]}\n\n\nChoose an action:', reply_markup=markup)
     elif call.data == 'new_order':
-        ...
+        user_id = call.message.chat.id
+        orders[user_id] = {}
+        deletion.append(call.message)
+        sent_message = bot.send_message(user_id, "Please enter the category.")
+        deletion.append(sent_message.id)
+        # deletion.clear()
+        bot.register_next_step_handler(call.message, handle_category)
             
 
 
@@ -279,7 +286,6 @@ def insert_all_user_data(message):
 
 
 orders = {}
-deletion = []
 
 
 @bot.message_handler(commands=['add_order'])
@@ -300,7 +306,7 @@ def handle_category(message):
         try:
             bot.delete_message(user_id, msg_id)
         except Exception as e:
-            print(f"Error deleting message {msg_id}: {e}")
+            pass
     deletion.clear()
     sent_message = bot.send_message(user_id, "Please enter the description of your order.")
     deletion.append(sent_message.id)
@@ -316,7 +322,7 @@ def handle_description(message):
         try:
             bot.delete_message(user_id, msg_id)
         except Exception as e:
-            print(f"Error deleting message {msg_id}: {e}")
+            pass
     deletion.clear()
     sent_message = bot.send_message(user_id, "Please upload an image of your order.")
     deletion.append(sent_message.id)
@@ -333,7 +339,7 @@ def handle_image(message):
             try:
                 bot.delete_message(user_id, msg_id)
             except Exception as e:
-                print(f"Error deleting message {msg_id}: {e}")
+                pass
         deletion.clear()
         sent_message = bot.send_message(user_id, "Please enter the location.")
         deletion.append(sent_message.id)
@@ -351,7 +357,7 @@ def handle_location(message):
         try:
             bot.delete_message(user_id, msg_id)
         except Exception as e:
-            print(f"Error deleting message {msg_id}: {e}")
+            pass
     deletion.clear()
     sent_message = bot.send_message(user_id, "Please enter the location link.")
     deletion.append(sent_message.id)
@@ -367,7 +373,7 @@ def handle_location_link(message):
         try:
             bot.delete_message(user_id, msg_id)
         except Exception as e:
-            print(f"Error deleting message {msg_id}: {e}")
+            pass
     deletion.clear()
     sent_message = bot.send_message(user_id, "Please enter the price.")
     deletion.append(sent_message.id)
@@ -381,13 +387,13 @@ def handle_price(message):
     orders[user_id]['price'] = price
 
     order_data = orders[user_id]
-
-    # print(post_order(order_data['category'], order_data['description'], order_data['image'], order_data['location'], order_data['location_link'], order_data['price'], user_id))
+    
+    print(order_data['category'], order_data['description'], order_data['image'], order_data['location'], order_data['location_link'], order_data['price'], user_id)
     for msg_id in deletion:
         try:
             bot.delete_message(user_id, msg_id)
         except Exception as e:
-            print(f"Error deleting message {msg_id}: {e}")
+            pass
     deletion.clear()
     bot.send_message(user_id, "Order added successfully!, /orders to see your order")
 
