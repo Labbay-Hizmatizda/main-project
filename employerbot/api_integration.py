@@ -97,7 +97,28 @@ def lang_patch(user_id, lang):
         return [{'Error': f'Request failed with status code: {response.status_code}'}]
 
 
-print(lang_patch(1, 2))
+# print(lang_patch(1, 2))
+
+def post_order(category, description, image, location, location_link, price, user_id):
+    data = {
+        "id": 3,
+        "description": description,
+        "media": image,
+        "location": location,
+        "location_link": location_link,
+        "price": price,
+        "is_active": True,
+        "owner_id": user_id,
+        "category": category
+    }
+    response = requests.post(f'{BASE_URL}orders/', json=data)
+    if response.status_code == 200:
+        return response.json()  
+    else:
+        return [{'Status_code': response.status_code,
+                        'Json': response.json()}]
+
+
 
 ''' Template for outputing any information
 

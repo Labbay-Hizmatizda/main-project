@@ -345,7 +345,7 @@ def handle_image(message):
         deletion.append(sent_message.id)
         bot.register_next_step_handler(message, handle_location)
     else:
-        handle_image(message)
+        bot.register_next_step_handler(message, handle_image)
 
 
 def handle_location(message):
@@ -388,7 +388,7 @@ def handle_price(message):
 
     order_data = orders[user_id]
     
-    print(order_data['category'], order_data['description'], order_data['image'], order_data['location'], order_data['location_link'], order_data['price'], user_id)
+    print(post_order(order_data['category'], order_data['description'], order_data['image'], order_data['location'], order_data['location_link'], order_data['price'], user_id))
     for msg_id in deletion:
         try:
             bot.delete_message(user_id, msg_id)
