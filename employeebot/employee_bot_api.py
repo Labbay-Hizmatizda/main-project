@@ -13,6 +13,9 @@ from api_integration import *
 bot = telebot.TeleBot('6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8')
 
 user_lang = {}
+deletion = []
+proposals = {}
+
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.InlineKeyboardMarkup()
@@ -73,9 +76,14 @@ User ID : {response[0]['user_id']}
     elif call.data == 'proposals_history':
         ...
     elif call.data == 'new_proposal':
-        message = call.message
-        if hasattr(message, 'chat'):
-            user_id = message.chat.id
+        user_id = call.message.chat.id
+        proposals[user_id] = {}
+        deletion.append(message.id)
+        sent_message = bot.send_message(user_id, "Please write the ID of the order you want to send apply")
+        deletion.append(sent_message.id)
+        bot.register_next_step_handler(message, handle_id)
+        
+
 
             
         
@@ -124,54 +132,51 @@ User ID : {response[0]['user_id']}
 
 
 
-orders = {}
-message_ids = {}
-
-@bot.message_handler(commands=['add_order'])
-def handle_add_order(message):
-    def handle_category(message):
-        def handle_description(message):
-            user_id = message.from_user.id
-            description = message.text
-            orders[user_id]['description'] = description
-            
-            sent_message = bot.send_message(user_id, "Please upload an image of your order.")
-            message_ids[user_id].append(sent_message.message_id)
-            message_ids[user_id].append(message.id)
-            print(message_ids[message.from_user.id])
-            clear_messages(message.from_user.id)
-            markup = russian()
-            bot.send_message(message.chat.id,
-                              'Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы\n\n\n', reply_markup=markup)
-
-            
-            # bot.register_next_step_handler(message, handle_image)
-        
-        user_id = message.from_user.id
-        category = message.text
-        orders[user_id]['category'] = category
-        
-        sent_message = bot.send_message(user_id, "Please enter the description of your order.")
-        message_ids[user_id].append(sent_message.message_id)
-        message_ids[user_id].append(message.id)
-        
-        bot.register_next_step_handler(message, handle_description)
     
-    orders[message.from_user.id] = {}
-    message_ids[message.from_user.id] = []
+
+@bot.message_handler(commands=['add_proposal'])
+def handle_add_proposal(message):
+    proposals[message.from_user.id] = {}
+    proposals[message.from_user.id]['owner_id'] = message.from_user.id
+    deletion.append(message.id)
+    sent_message = bot.send_message(message.from_user.id, "Please write the ID of the order you want to send apply")
+    deletion.append(sent_message.id)
+    bot.register_next_step_handler(message, handle_id)
+
+
+
+def handle_id(message):
+    user_id = message.from_user.id
+    deletion.append(message.id)
+    order_id = message.text
+    proposals[user_id]['order_id'] = order_id
+    for msg_id in deletion:
+        try:
+            bot.delete_message(user_id, msg_id)
+        except Exception as e:
+            pass
+    deletion.clear()
+    sent_message = bot.send_message(user_id, "Please write the amount of money you want to receive")
+    deletion.append(sent_message.id)
+    bot.register_next_step_handler(message, inset_to_db)
+
+
+def inset_to_db(message):
+    user_id = message.from_user.id
+    deletion.append(message.id)
+    price = message.text
+    proposals[user_id]['price'] = price
+
+    proposals_data = proposals[user_id]
     
-    sent_message = bot.send_message(message.from_user.id, "Please enter the category.")
-    message_ids[message.from_user.id].append(sent_message.message_id)
-    message_ids[message.from_user.id].append(message.message_id)
-    
-    bot.register_next_step_handler(message, handle_category)
-
-
-def clear_messages(user_id):
-    for msg_id in message_ids[user_id]:
-        bot.delete_message(user_id, msg_id)
-    del message_ids[user_id]
-
+    print(post_proposal(proposals_data['order_id'], proposals_data['price'], user_id))
+    for msg_id in deletion:
+        try:
+            bot.delete_message(user_id, msg_id)
+        except Exception as e:
+            pass
+    deletion.clear()
+    bot.send_message(user_id, "Order added successfully!, /orders to see your order")
 
 
 print('\n.', '.', '.\n')

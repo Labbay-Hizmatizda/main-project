@@ -385,7 +385,6 @@ def handle_price(message):
     deletion.append(message.id)
     price = message.text
     orders[user_id]['price'] = price
-
     order_data = orders[user_id]
     
     print(post_order(order_data['category'], order_data['description'], order_data['image'], order_data['location'], order_data['location_link'], order_data['price'], user_id))
