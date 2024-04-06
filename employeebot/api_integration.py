@@ -2,6 +2,7 @@ import requests
 
 BASE_URL = "http://127.0.0.1:8000/api/"
 
+# 1231138963
 
 def get_employee(user_id):
     response = requests.get(f'{BASE_URL}employees/?user_id={user_id}') 
@@ -34,7 +35,7 @@ def get_proposals(user_id):
     response = requests.get(f'{BASE_URL}proposals/?owner_id={id_value}')
     if response.status_code == 200:
         return response.json()
-
+print(get_proposals(1231138963))
 
 def get_lang(user_id):
     get_id_from = requests.get(f'{BASE_URL}employers/?user_id={user_id}')

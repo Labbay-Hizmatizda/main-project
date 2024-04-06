@@ -27,6 +27,7 @@ def start(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
+    global proposals
     if call.data == 'lang_rus':
         user_lang[call.from_user.id] = 'rus'
         # cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
@@ -75,18 +76,18 @@ User ID : {response[0]['user_id']}
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text=f'{text}', reply_markup=markup)    
     elif call.data == 'proposals_history':
         ...
-    elif call.data == 'new_proposal':
+    elif call.data == 'new_proposal': 
         user_id = call.message.chat.id
         proposals[user_id] = {}
-        deletion.append(message.id)
+        deletion.append(call.message.id)
         sent_message = bot.send_message(user_id, "Please write the ID of the order you want to send apply")
         deletion.append(sent_message.id)
-        bot.register_next_step_handler(message, handle_id)
-        
+        bot.register_next_step_handler(call.message, handle_id)
 
 
-            
-        
+                
+
+
 
     # --uzbek lang ---------------------------------------------------------------------------------------------
 
