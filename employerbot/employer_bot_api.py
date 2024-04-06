@@ -1,4 +1,3 @@
-from datetime import datetime
 import os
 import telebot
 from telebot.types import ReplyKeyboardRemove
@@ -179,7 +178,7 @@ def handle_choosing_identifier_type(message):
         bot.register_next_step_handler(message, handle_id_image_first)
     else:
         bot.send_message(user_id, "Тип идентификатора не распознан. Пожалуйста, выберите тип идентификатора снова.")
-        handle_choosing_identifier_type(message)
+        bot.register_next_step_handler(message, handle_choosing_identifier_type)
 
 
 def handle_id_image_first(message):
@@ -274,14 +273,12 @@ def insert_all_user_data(message):
     #     (user_id, user_info[user_id]['name'], user_info[user_id]['surname'],
     #      user_info[user_id]['phone_number'], date_created))
     # conn.commit()
-    post_employer(user_id, user_info[user_id]['name'], user_info[user_id]['surname'], user_info[user_id]['phone_number'])
+    print(post_employer(user_id, user_info[user_id]['name'], user_info[user_id]['surname'], user_info[user_id]['phone_number']))
 
     # cursor.execute(
     #     "INSERT INTO admin_page_app_cv (image, bio, rating, owner_id) VALUES (?, ?, ?, ?)",
     #     ('media/cv/cv_image.jpg', user_info[user_id]['bio'], 0, user_id))
     # conn.commit()
-    # print(post_cv(user_info[user_id]['bio'], user_id))
-
     bot.send_message(user_id, "Отлично! Теперь вы можете использовать команду /jobs для просмотра доступных действий.")
 
 
