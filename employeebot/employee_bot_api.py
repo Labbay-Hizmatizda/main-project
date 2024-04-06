@@ -69,6 +69,7 @@ User ID : {response[0]['user_id']}
         user_id = call.from_user.id
 
         response = get_proposals(user_id)
+        print(response)
         text = ""
         for proposals in response:
             text += f"ID : {proposals['id']}\nOwner_id : {proposals['owner_id']}\nOrder_id : {proposals['order_id']}\nPrice : {proposals['price']}\n\n"
@@ -126,15 +127,6 @@ User ID : {response[0]['user_id']}
 
 
 
-
-
-
-
-
-
-
-    
-
 @bot.message_handler(commands=['add_proposal'])
 def handle_add_proposal(message):
     proposals[message.from_user.id] = {}
@@ -177,7 +169,9 @@ def inset_to_db(message):
         except Exception as e:
             pass
     deletion.clear()
-    bot.send_message(user_id, "Order added successfully!, /orders to see your order")
+    bot.send_message(user_id, "Proposal added successfully!, you can see all your responses in the markup called \"active proposals\"")
+
+
 
 
 print('\n.', '.', '.\n')
