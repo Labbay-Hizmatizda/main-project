@@ -24,14 +24,29 @@ def back_about_us():
 def my_account_rus():
     markup = types.InlineKeyboardMarkup(row_width=1)
 
-    see_cv = types.InlineKeyboardButton('Смотреть свой резюме', callback_data='see_cv')
-    change_phone_number = types.InlineKeyboardButton('Изменить номер', callback_data='change_phone_num_rus')
-    change_name_surname = types.InlineKeyboardButton('Изменить имя фамилию', callback_data='change_name_surname_rus')
+    change_photo = types.InlineKeyboardButton('Смотреть фото', callback_data='change_photo')
+    change_phone_number = types.InlineKeyboardButton('Изменить номер', callback_data='change_phonenumber_rus')
+    change_name = types.InlineKeyboardButton('Изменить имя', callback_data='change_name_rus')
+    change_surname = types.InlineKeyboardButton('Изменить фамилию', callback_data='change_surname_rus')
     change_language = types.InlineKeyboardButton('Изменить язык', callback_data='change_language_rus')
     back = types.InlineKeyboardButton('◀ Назад', callback_data='back_to_main_menu_rus')
-    markup.add(see_cv,change_name_surname, change_phone_number, change_language, back)
+    markup.add(change_photo, change_name, change_surname, change_phone_number, change_language, back)
     return markup
 
+def change_lang___rus():
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='identify_lang_rus')
+    lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='identify_lang_uz')
+    back = types.InlineKeyboardButton('◀ Назад', callback_data='back_to_main_menu_rus')
+    
+    markup.add(lang_rus, lang_uz, back)
+    return markup
+
+def cancel_rus():
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    cancel = types.InlineKeyboardButton('Отменить', callback_data='cancel_rus')
+    markup.add(cancel)
+    return markup
 
 
 def change_cv_info_rus():
@@ -40,8 +55,6 @@ def change_cv_info_rus():
     change_bio = types.InlineKeyboardButton('Изменить биографию', callback_data='change_name_surname_rus')
     back_cv = types.InlineKeyboardButton('◀ Назад', callback_data='back_cv')
     markup.add(change_image, change_bio, back_cv)
-
-
 
 
 def proposals_rus():

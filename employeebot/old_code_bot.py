@@ -126,6 +126,7 @@ def check_handle_phone_number(message):
     user_id = message.from_user.id
     phone_number = message.contact.phone_number if message.contact else None
     user_info[user_id]['phone_number'] = phone_number
+    # bot.edit_message_reply_markup(message, reply_markup=None)
 
     if phone_number:
         bot.send_message(user_id, "Введите ваше имя:", reply_markup=ReplyKeyboardRemove())

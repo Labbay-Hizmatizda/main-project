@@ -2,7 +2,7 @@ import requests
 
 BASE_URL = "http://127.0.0.1:8000/api/"
 
-# 1231138963
+user_id = 1231138963
 
 def get_employee(user_id):
     response = requests.get(f'{BASE_URL}employees/?user_id={user_id}') 
@@ -35,7 +35,7 @@ def get_proposals(user_id):
     response = requests.get(f'{BASE_URL}proposals/?owner_id={id_value}')
     if response.status_code == 200:
         return response.json()
-print(get_proposals(1231138963))
+# print(get_proposals(1231138963))
 
 def get_lang(user_id):
     get_id_from = requests.get(f'{BASE_URL}employers/?user_id={user_id}')
@@ -68,19 +68,37 @@ def post_employer(user_id, name, surname, phone_number):
                         'Json': response.json()}]
 
 
-def patch_employers():
-    data = {
-        'user_id': 3097,
-    }
+def patch_employees(user_id, value, which):
+    get_id_from = requests.get(f'{BASE_URL}employees/?user_id={user_id}')
+    id = get_id_from.json()
+    id_value = id[0]['id']
+    print(id_value)
+    if which == 'name':
+        data = {
+            'name': value,
+        }
+    elif which == 'surname':
+        data = {
+            'surname': value,
+        }
+    elif which == 'phone':
+        data = {
+            'phone_number': value,
+        }
 
-    response = requests.patch('http://127.0.0.1:8000/api/employers/4/', json=data)
+    response = requests.patch(f'http://127.0.0.1:8000/api/employees/{id_value}/', json=data)
     if response.status_code == 200:
-        return response.json()
+        try:
+            return response.json()
+        except ValueError:
+            return [{'Status_code': response.status_code,
+                     'Message': 'Response is not in JSON format.'}]
     else:
         return [{'Status_code': response.status_code,
-                        'Json': response.json()}]
+                 'Json': response.json()}]
 
 
+# print(patch_employees(user_id, 'Abdurrohman', 'name'))
 
 def post_proposal(order_id, price, owner_id,):
     get_id_from = requests.get(f'{BASE_URL}employers/?user_id={owner_id}')

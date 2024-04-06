@@ -41,7 +41,7 @@ def callback_query(call):
         back = types.InlineKeyboardButton('◀ Назад', callback_data='about_us_back_menu')
         markup.add(url, back)
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Наш сайт ⇣", reply_markup=markup)
-    elif call.data == 'my_account_rus':
+    elif call.data == 'my_account_rus' or call.data == 'cancel_rus':
         user_id = call.from_user.id
 
         markup = my_account_rus()
@@ -54,6 +54,81 @@ User ID : {response[0]['user_id']}
         '''
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text=f"{text}Какое действие вы хотите сделать :......", reply_markup=markup)
+    
+
+    elif call.data == 'change_photo':
+        user_id = call.from_user.id
+        chat_id=call.message.chat.id
+        message_id=call.message.id
+
+        markup = cancel_rus()
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=f'Отправьте ваше новое фото', reply_markup=markup)    
+        bot.register_next_step_handler(call.message, change_photo)
+
+    elif call.data == 'change_phonenumber_rus':
+        user_id = call.from_user.id
+        chat_id=call.message.chat.id
+        message_id=call.message.id
+        markup = cancel_rus()
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=f'Напишите ваш новый номер', reply_markup=markup)    
+        bot.register_next_step_handler(call.message, change_phonenumber_rus)
+    
+    elif call.data == 'change_name_rus':
+        user_id = call.from_user.id
+        chat_id=call.message.chat.id
+        message_id=call.message.id
+
+        markup = cancel_rus()
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=f'Напишите ваше имя', reply_markup=markup)    
+        bot.register_next_step_handler(call.message, change_name_rus)
+        
+    elif call.data == 'change_surname_rus':
+        user_id = call.from_user.id
+        chat_id = call.message.chat.id
+        message_id=call.message.id
+
+
+        markup = cancel_rus()
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=f'Напишите вашу фамилию', reply_markup=markup)    
+        bot.register_next_step_handler(call.message, change_surname_rus)
+        
+    elif call.data == 'change_language_rus':
+        user_id = call.from_user.id
+        chat_id=call.message.chat.id
+        message_id=call.message.id
+
+        markup = change_lang___rus()
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=f'Выберите язык 🇷🇺/🇺🇿', reply_markup=markup)    
+
+    elif call.data == 'identify_lang_rus':
+        user_id = call.from_user.id
+        markup = my_account_rus()
+        # response = patch_lang(user_id)
+        response = get_employee(user_id)
+        text = f'''
+User ID : {response[0]['user_id']}
+Имя : {response[0]['name']}
+Фамилия : {response[0]['surname']}
+Телефон номера : {response[0]['phone_number']}\n\n
+        '''
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
+                              text=f"{text}|-|-|-|-|-|-|-|-|", reply_markup=markup)
+    
+    elif call.data == 'identify_lang_uz':
+        user_id = call.from_user.id
+        markup = my_account_rus()
+        # response = patch_lang(user_id)
+        response = get_employee(user_id)
+        text = f'''
+User ID : {response[0]['user_id']}
+Isim : {response[0]['name']}
+Sharif : {response[0]['surname']}
+Telefon nomer : +{response[0]['phone_number']}\n\n
+        '''
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
+                              text=f"{text}\n|-|-|-|-|-|-|-|-|", reply_markup=markup)
+
+
     elif call.data == 'back_to_main_menu_rus' or call.data == 'about_us_back_menu':
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
@@ -85,9 +160,7 @@ User ID : {response[0]['user_id']}
         deletion.append(sent_message.id)
         bot.register_next_step_handler(call.message, handle_id)
 
-
-                
-
+        
 
 
     # --uzbek lang ---------------------------------------------------------------------------------------------
@@ -124,6 +197,27 @@ User ID : {response[0]['user_id']}
         markup = uzbek()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text="Glavni menyu \nNma qmohchisiz: ", reply_markup=markup)
+
+def change_photo(message):
+    # patch_employers(user_id, value, 'phone')
+    ...
+def change_phonenumber_rus(message):
+    user_id = message.from_user.id
+    value = message.text
+
+    print(patch_employees(user_id, value, 'phone'))
+
+def change_name_rus(message):
+    user_id = message.from_user.id
+    value = message.text
+    print(patch_employees(user_id, value, 'name'))
+
+def change_surname_rus(message):
+    user_id = message.from_user.id
+    value = message.text
+    print(patch_employees(user_id, value, 'surname'))
+
+
 
 
 
@@ -171,7 +265,9 @@ def inset_to_db(message):
     deletion.clear()
     bot.send_message(user_id, "Proposal added successfully!, you can see all your responses in the markup called \"active proposals\"")
 
-
+@bot.message_handler(commands=['kyc'])
+def kyc(message):
+    ...
 
 
 print('\n.', '.', '.\n')
