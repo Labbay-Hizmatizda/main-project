@@ -108,7 +108,6 @@ def lang_patch(user_id, lang):
 
 def post_order(category, description, image, location, location_link, price, user_id):
     data = {
-        "id": 3,
         "description": description,
         "media": image,
         "location": location,

@@ -81,21 +81,25 @@ def patch_employers():
 
 
 
-def post_cv(bio, owner_id):
+def post_proposal(order_id, price, owner_id,):
+    get_id_from = requests.get(f'{BASE_URL}employers/?user_id={owner_id}')
+    id = get_id_from.json()
+    user_id = id[0]['id']
     data = {
-        'media': 'media/cv/cv_image.jpg',
-        'bio': bio,
-        'rating': 0,
-        'owner_id': owner_id,
+        'owner_id' : user_id,
+        'order_id' : order_id,
+        'price' : price
     }
-    response = requests.post(f'{BASE_URL}cvs/', json=data)
+    response = requests.post(f'{BASE_URL}proposals/', json=data)
     if response.status_code == 200:
+        print(response.json())
         return response.json()  
     else:
         print('sv')
         return [{'Status_code': response.status_code,
                         'Json': response.json()}]
-    
+
+
 
 def post_cv(bio, owner_id):
     data = {
