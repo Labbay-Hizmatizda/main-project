@@ -60,13 +60,19 @@ def patch_employers():
 
 
 def post_cv(bio, owner_id):
+    get_id_from = requests.get(f'{BASE_URL}employers/?user_id={owner_id}')
+    id = get_id_from.json()
+    print(id)
+    id_value = id[0]['id']
+    
     data = {
         'media': 'media/cv/cv_image.jpg',
         'bio': bio,
-        'rating': 0,
-        'owner_id': owner_id,
+        'rating': 1,
+        'owner_id': id_value,
     }
     response = requests.post(f'{BASE_URL}cvs/', json=data)
+    
     if response.status_code == 200:
         return response.json()  
     else:
@@ -74,6 +80,7 @@ def post_cv(bio, owner_id):
         return [{'Status_code': response.status_code,
                         'Json': response.json()}]
     
+# print(post_cv('wdc', 1927099919))
 
 def lang_patch(user_id, lang):
     data = {
