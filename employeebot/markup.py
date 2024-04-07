@@ -6,7 +6,7 @@ from telebot import types
 def russian():
     markup = types.InlineKeyboardMarkup(row_width=1)
 
-    about_us = types.InlineKeyboardButton('О нас ℹ️', callback_data='about_us_rus')
+    about_us = types.InlineKeyboardButton('О нас ℹ️ ', callback_data='about_us_rus')
     my_account = types.InlineKeyboardButton('Мои Данные 💾', callback_data='my_account_rus')
     orders = types.InlineKeyboardButton('Отлики 📜', callback_data='proposals_rus')
 
@@ -37,7 +37,7 @@ def change_lang___rus():
     markup = types.InlineKeyboardMarkup(row_width=1)
     lang_rus = types.InlineKeyboardButton('Русский 🇷🇺 ', callback_data='identify_lang_rus')
     lang_uz = types.InlineKeyboardButton('O\'zbek tili 🇺🇿 ', callback_data='identify_lang_uz')
-    back = types.InlineKeyboardButton('Назад ◀️', callback_data='cancel_rus')
+    back = types.InlineKeyboardButton('Отменить ❌', callback_data='cancel_rus')
     
     markup.add(lang_rus, lang_uz, back)
     return markup

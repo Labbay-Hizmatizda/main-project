@@ -9,8 +9,8 @@ from markup import *
 from api_integration import *
 from api_integration import *
 
-# Creating the bot object
-bot = telebot.TeleBot('6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8')
+token = '6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8'
+bot = telebot.TeleBot(token)
 
 user_lang = {}
 deletion = []
@@ -35,10 +35,10 @@ def callback_query(call):
                               text='Главный меню:\n     /kyc для верификации\n     /add_proposal посмотреть заказы\n\n\n', reply_markup=markup)
     elif call.data == 'about_us_rus':
         markup = types.InlineKeyboardMarkup()
-        url = types.InlineKeyboardButton(text='Наш сайт', url='https://youtube.com')
+        url = types.InlineKeyboardButton(text='Наш сайт ', url='https://youtube.com')
         back = types.InlineKeyboardButton('◀ Назад', callback_data='about_us_back_menu')
         markup.add(url, back)
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Наш сайт ⇣", reply_markup=markup)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Наш сайт ⏬", reply_markup=markup)
     elif call.data == 'my_account_rus' or call.data == 'cancel_rus':
         user_id = call.from_user.id
 
@@ -101,7 +101,7 @@ User ID : {response[0]['user_id']}
     elif call.data == 'identify_lang_rus':
         user_id = call.from_user.id
         markup = my_account_rus()
-        # response = patch_lang(user_id)
+        print(patch_lang(user_id))
         response = get_employee(user_id)
         text = f'''
 User ID : {response[0]['user_id']}
@@ -115,7 +115,7 @@ User ID : {response[0]['user_id']}
     elif call.data == 'identify_lang_uz':
         user_id = call.from_user.id
         markup = my_account_rus()
-        # response = patch_lang(user_id)
+        print(patch_lang(user_id, 'uz'))
         response = get_employee(user_id)
         text = f'''
 User ID : {response[0]['user_id']}
@@ -130,7 +130,7 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
     elif call.data == 'back_to_main_menu_rus' or call.data == 'about_us_back_menu':
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text='Главный меню:\n     /kyc для верификации\n     /add_orders посмотреть заказы'.format(
+                              text='Главный меню:\n     /kyc для верификации\n     /add_proposal посмотреть заказы'.format(
                                   call.from_user.first_name), reply_markup=markup)
     elif call.data == 'proposals_rus' or call.data == 'back_orders' or call.data == 'back_proposals':
         markup = proposals_rus()
@@ -197,8 +197,36 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
                               text="Glavni menyu \nNma qmohchisiz: ", reply_markup=markup)
 
 def change_photo(message):
-    # patch_employers(user_id, value, 'phone')
-    ...
+    if message.content_type == 'photo':
+        user_id = message.from_user.id
+        directory = os.path.join("media", "cv_photo", str(user_id))
+
+        os.makedirs(directory, exist_ok=True)
+        
+        file_id = message.photo[-1].file_id
+        file_info = bot.get_file(file_id)
+        file_path = file_info.file_path
+        downloaded_file = bot.download_file(file_path)
+
+        image_path = os.path.join(directory, f'{str(user_id)}.jpg')
+        print(image_path)
+        with open(image_path, 'wb') as photo:
+            photo.write(downloaded_file)
+        bot.delete_message(user_id, message.id)
+        
+        response = get_employee(user_id)
+        text = f'''
+User ID : {response[0]['user_id']}
+Isim : {response[0]['name']}
+Sharif : {response[0]['surname']}
+Telefon nomer : +{response[0]['phone_number']}\n\n
+        '''
+        markup = my_account_rus()
+        bot.send_message(user_id, f"{text}", reply_markup=markup)
+    else:
+        bot.register_next_step_handler(message, change_photo)
+
+
 def change_phonenumber_rus(message):
     user_id = message.from_user.id
     value = message.text
