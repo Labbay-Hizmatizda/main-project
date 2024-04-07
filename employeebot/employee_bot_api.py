@@ -23,18 +23,16 @@ def start(message):
     lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='lang_uz')
 
     markup.add(lang_rus, lang_uz)
-    bot.send_message(message.chat.id, "Выберите язык 🌐\nTilni tanlang 🌐", reply_markup=markup)
+    bot.send_message(message.chat.id, "Выберите язык 🌍\nTilni tanlang 🌍", reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     global proposals
     if call.data == 'lang_rus':
         user_lang[call.from_user.id] = 'rus'
-        # cursor.execute('''INSERT INTO admin_page_app_language (user_id, language)
-        #                   VALUES (?, ?)''', (call.from_user.id, 'rus'))
         markup = russian()
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text='Главный меню:\n     /log_into для верификации\n     /add_orders посмотреть заказы\n\n\n', reply_markup=markup)
+                              text='Главный меню:\n     /kyc для верификации\n     /add_proposal посмотреть заказы\n\n\n', reply_markup=markup)
     elif call.data == 'about_us_rus':
         markup = types.InlineKeyboardMarkup()
         url = types.InlineKeyboardButton(text='Наш сайт', url='https://youtube.com')
