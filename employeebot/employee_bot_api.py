@@ -18,11 +18,15 @@ proposals = {}
 
 @bot.message_handler(commands=['start'])
 def start(message):
+    user_id = message.from_user.id
+
     markup = types.InlineKeyboardMarkup()
     lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_rus')
     lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='lang_uz')
 
     markup.add(lang_rus, lang_uz)
+    message_smth = bot.send_message(message.chat.id, 'ㅤㅤㅤㅤ', reply_markup=ReplyKeyboardRemove())
+    bot.delete_message(user_id, message_smth.id)
     bot.send_message(message.chat.id, "Выберите язык 🌍\nTilni tanlang 🌍", reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -31,6 +35,9 @@ def callback_query(call):
     if call.data == 'lang_rus':
         user_lang[call.from_user.id] = 'rus'
         markup = russian()
+        message_smth = bot.send_message(call.message.chat.id, 'ㅤㅤㅤㅤ', reply_markup=ReplyKeyboardRemove())
+        
+        bot.delete_message(chat_id=call.message.chat.id, message_id=message_smth.id)
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text='Главный меню:\n     /kyc для верификации\n     /add_proposal посмотреть заказы\n\n\n', reply_markup=markup)
     elif call.data == 'about_us_rus':
@@ -83,12 +90,15 @@ User ID : {response[0]['user_id']}
     elif call.data == 'change_surname_rus':
         user_id = call.from_user.id
         chat_id = call.message.chat.id
-        message_id=call.message.id
-
+        message_id = call.message.message_id
 
         markup = cancel_rus()
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=f'Напишите вашу фамилию', reply_markup=markup)    
-        bot.register_next_step_handler(call.message, change_surname_rus)
+
+        # Удаляем оригинальное сообщение перед редактированием
+
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=f'Напишите вашу фамилию', reply_markup=markup)\
+        
+        bot.register_next_step_handler(call.message, change_surname_rus, message_id = message_id)
         
     elif call.data == 'change_language_rus':
         user_id = call.from_user.id
@@ -212,7 +222,8 @@ def change_photo(message):
         print(image_path)
         with open(image_path, 'wb') as photo:
             photo.write(downloaded_file)
-        bot.delete_message(user_id, message.id)
+
+        delete__message(user_id, message.id)
         
         response = get_employee(user_id)
         text = f'''
@@ -224,6 +235,7 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
         markup = my_account_rus()
         bot.send_message(user_id, f"{text}", reply_markup=markup)
     else:
+        bot.send_message(message)
         bot.register_next_step_handler(message, change_photo)
 
 
@@ -238,9 +250,21 @@ def change_name_rus(message):
     value = message.text
     print(patch_employees(user_id, value, 'name'))
 
-def change_surname_rus(message):
+def change_surname_rus(message, message_id):
     user_id = message.from_user.id
     value = message.text
+    delete__message(user_id, message_id)
+
+    delete__message(user_id, message.id)
+    response = get_employee(user_id)
+    text = f'''
+    User ID : {response[0]['user_id']}
+    Isim : {response[0]['name']}
+    Sharif : {response[0]['surname']}
+    Telefon nomer : +{response[0]['phone_number']}\n\n
+            '''
+    markup = my_account_rus()
+    bot.send_message(user_id, f"{text}", reply_markup=markup)
     print(patch_employees(user_id, value, 'surname'))
 
 
@@ -250,7 +274,9 @@ def change_surname_rus(message):
 @bot.message_handler(commands=['add_proposal'])
 def handle_add_proposal(message):
     proposals[message.from_user.id] = {}
+    print(proposals)
     proposals[message.from_user.id]['owner_id'] = message.from_user.id
+    print(proposals)
     deletion.append(message.id)
     sent_message = bot.send_message(message.from_user.id, "Please write the ID of the order you want to send apply")
     deletion.append(sent_message.id)
@@ -294,6 +320,10 @@ def inset_to_db(message):
 @bot.message_handler(commands=['kyc'])
 def kyc(message):
     ...
+
+
+def delete__message(chat_id, message_id):
+    bot.delete_message(chat_id, message_id)
 
 
 print('\n.', '.', '.\n')

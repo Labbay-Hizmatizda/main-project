@@ -10,12 +10,12 @@ def get_employee(user_id):
         if response.json() == []:
             return None
         else:
-            return response.csv()
+            return response.json()
     else:
         # return [{'Status_code': response.status_code,
         #                 'Json': response.json()}]
         return None    
-# print(get_employee(1231138963))
+# print(get_employee())
 
 def get_cv(user_id):
     response = requests.get(f'{BASE_URL}cvs/?user_id={user_id}')
@@ -48,8 +48,8 @@ def get_proposals(user_id):
     response = requests.get(f'{BASE_URL}proposals/?owner_id={id_value}')
     if response.status_code == 200:
         return response.json()
-# print(get_proposals(1231138963))
 
+ 
 def get_lang(user_id):
     get_id_from = requests.get(f'{BASE_URL}employers/?user_id={user_id}')
     id = get_id_from.json()
@@ -63,7 +63,6 @@ def get_lang(user_id):
     else:
         return response.json()
 
-# print()
 
 
 
@@ -93,8 +92,7 @@ def post_employer(user_id, name, surname, phone_number):
     else:
         return [{'Status_code': response.status_code,
                         'Json': response.json()}]
-
-
+    
 
 def post_proposal(order_id, price, owner_id,):
     get_id_from = requests.get(f'{BASE_URL}employers/?user_id={owner_id}')
@@ -113,6 +111,22 @@ def post_proposal(order_id, price, owner_id,):
         return [{'Status_code': response.status_code,
                         'Json': response.json()}]
 
+
+def post_passport(user_id, url):
+    get_id_from = requests.get(f'{BASE_URL}employees/?user_id={user_id}')
+    id = get_id_from.json()
+    owner_id = id[0]['id']
+
+    data = {
+        'images_dir' : url,
+        'owner_id' : owner_id,
+    }
+    response = requests.post(f'{BASE_URL}employee_passports/', json=data)
+    if response.status_code == 200:
+        return response.json()   
+    else:
+        return [{'Status_code': response.status_code,
+                        'Json': response.json()}]   
 
 
 def post_cv(bio, owner_id):
@@ -168,6 +182,7 @@ def patch_employees(user_id, value, which):
         return [{'Status_code': response.status_code,
                  'Json': response.json()}]
     
+
 def patch_cv(user_id, value, which):
     get_id_from = requests.get(f'{BASE_URL}employees/?user_id={user_id}')
     id = get_id_from.json()
@@ -215,7 +230,7 @@ def patch_lang(user_id, which):
         return [{'Status_code': response.status_code,
                 'Json': response.json()}] 
    
-print(patch_lang(1231138963, 'ru'))
+# print(patch_lang(1231138963, 'ru'))
 
 
 
