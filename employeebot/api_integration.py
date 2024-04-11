@@ -51,18 +51,20 @@ def get_proposals(user_id):
 
  
 def get_lang(user_id):
-    get_id_from = requests.get(f'{BASE_URL}employers/?user_id={user_id}')
-    id = get_id_from.json()
-    id_value = id[0]['id']
-    response = requests.get(f'{BASE_URL}language/?owner_id={id_value}')
+    response = requests.get(f'{BASE_URL}employees/?user_id={user_id}')
+    id = response.json()
+
     if response.status_code == 200:
-        if response.json() == []:
+        if id[0]['language'] == None:
             return None
         else:
-            return response.json()
+            if id[0]['language'] == 7:
+                return 'ru' 
+            return 'uz'
     else:
         return response.json()
-
+    
+print(get_lang(1231138963))
 
 
 
@@ -94,7 +96,7 @@ def post_employer(user_id, name, surname, phone_number):
                         'Json': response.json()}]
     
 
-def post_proposal(order_id, price, owner_id,):
+def post_proposal(order_id, price, owner_id):
     get_id_from = requests.get(f'{BASE_URL}employers/?user_id={owner_id}')
     id = get_id_from.json()
     user_id = id[0]['id']
@@ -215,7 +217,7 @@ def patch_lang(user_id, which):
         }
     elif which == 'uz':
         data = {
-            'language' : 6
+            'language' : 8
         }
 
     response = requests.get(f'{BASE_URL}employees/?user_id={user_id}')
@@ -229,8 +231,10 @@ def patch_lang(user_id, which):
         print(1)
         return [{'Status_code': response.status_code,
                 'Json': response.json()}] 
+
+
+print(patch_lang(1231138963, 'ru'))
    
-# print(patch_lang(1231138963, 'ru'))
 
 
 

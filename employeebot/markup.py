@@ -46,6 +46,7 @@ def cancel_rus():
     markup = types.InlineKeyboardMarkup(row_width=1)
     cancel = types.InlineKeyboardButton('Отменить ❌', callback_data='cancel_rus')
     markup.add(cancel)
+
     return markup
 
 
