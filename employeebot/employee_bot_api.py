@@ -14,6 +14,7 @@ user_lang = {}
 deletion = []
 proposals = {}
 image = {}
+proposal_image=0
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -39,10 +40,13 @@ def start(message):
         bot.delete_message(user_id, message_smth.id)
         bot.send_message(message.chat.id, "Выберите язык 🌍\nTilni tanlang 🌍", reply_markup=markup)
 
+
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     global proposals
     global image
+    global proposal_image
+    
     if call.data == 'lang_rus':
         user_id = call.from_user.id
         patch_lang(user_id, 'ru')
@@ -61,7 +65,9 @@ def callback_query(call):
         markup.add(url, back)
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Наш сайт ⏬", reply_markup=markup)
     elif call.data == 'my_account_rus' or call.data == 'cancel_rus':
+
         user_id = call.from_user.id
+        delete__message(user_id, call.message.id)
         markup = my_account_rus()
         response = get_employee(user_id)
         text = f'''
@@ -74,15 +80,19 @@ User ID : {response[0]['user_id']}
         photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
         image_id = bot.send_photo(call.message.chat.id, photo=open(photo_path, 'rb'))
         message_id = image_id.message_id
-        image[user_id] = message_id
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
-                              text=f"{text}Какое действие вы хотите сделать :......", reply_markup=markup)
+        user = str(user_id)
+        image[user] = message_id
+        bot.send_message(call.message.chat.id,
+                              f"{text}Какое действие вы хотите сделать :......", reply_markup=markup)
 
     elif call.data == 'change_photo':
         user_id = call.from_user.id
         chat_id=call.message.chat.id
         message_id=call.message.id
 
+        user = str(user_id)
+        delete__message(user_id, image[user])
+        
         markup = cancel_rus()
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=f'Отправьте ваше новое фото', reply_markup=markup)    
         bot.register_next_step_handler(call.message, change_photo, message_id = message_id)
@@ -91,6 +101,9 @@ User ID : {response[0]['user_id']}
         user_id = call.from_user.id
         chat_id=call.message.chat.id
         message_id=call.message.id
+
+        user = str(user_id)
+        delete__message(user_id, image[user])
 
         markup = cancel_rus()
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=f'Напишите ваш новый номер', reply_markup=markup)    
@@ -101,6 +114,9 @@ User ID : {response[0]['user_id']}
         chat_id=call.message.chat.id
         message_id=call.message.id
 
+        user = str(user_id)
+        delete__message(user_id, image[user])
+
         markup = cancel_rus()
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=f'Напишите ваше имя', reply_markup=markup)    
         bot.register_next_step_handler(call.message, change_name_rus, message_id = message_id)
@@ -109,6 +125,9 @@ User ID : {response[0]['user_id']}
         user_id = call.from_user.id
         chat_id = call.message.chat.id
         message_id = call.message.message_id
+
+        user = str(user_id)
+        delete__message(user_id, image[user])
 
         markup = cancel_rus()
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=f'Напишите вашу фамилию', reply_markup=markup)
@@ -129,6 +148,10 @@ User ID : {response[0]['user_id']}
 
         delete__message(user_id, message_id)
         print(patch_lang(user_id, 'ru'))
+
+        user = str(user_id)
+        delete__message(user_id, image[user])
+
         response = get_employee(user_id)
         text = f'''
 User ID : {response[0]['user_id']}
@@ -140,7 +163,8 @@ User ID : {response[0]['user_id']}
         photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
         image_id = bot.send_photo(call.message.chat.id, photo=open(photo_path, 'rb'))
         message_id = image_id.message_id
-        image[user_id] = message_id
+        user = str(user_id)
+        image[user] = message_id
         bot.send_message(chat_id=call.message.chat.id,
                               text=f"{text}|-|-|-|-|-|-|-|-|", reply_markup=markup)
     
@@ -150,6 +174,9 @@ User ID : {response[0]['user_id']}
 
         delete__message(user_id, message_id)
         print(patch_lang(user_id, 'uz'))
+
+        user = str(user_id)
+        delete__message(user_id, image[user])
 
         response = get_employee(user_id)
         text = f'''
@@ -162,15 +189,17 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
         photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
         image_id = bot.send_photo(call.message.chat.id, photo=open(photo_path, 'rb'))
         message_id = image_id.message_id
-        image[user_id] = message_id
-
-        markup = my_account_rus()
+        user = str(user_id)
+        image[user] = message_id
         bot.send_message(chat_id=call.message.chat.id,
                               text=f"{text}\n|-|-|-|-|-|-|-|-|", reply_markup=markup)
 
 
     elif call.data == 'back_to_main_menu_rus' or call.data == 'about_us_back_menu':
         markup = russian()
+        user_id = call.from_user.id
+        user = str(user_id)
+        delete__message(user_id, image[user])
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text='Главный меню:\n     /kyc для верификации\n     /add_proposal посмотреть заказы'.format(
                                   call.from_user.first_name), reply_markup=markup)
@@ -200,7 +229,7 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
         deletion.append(sent_message.id)
         bot.register_next_step_handler(call.message, handle_id, message_id=message_id)
 
-        
+      
 
 
     # --uzbek lang ---------------------------------------------------------------------------------------------
@@ -331,7 +360,8 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
         photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
         image_id = bot.send_photo(message.chat.id, photo=open(photo_path, 'rb'))
         message_id = image_id.message_id
-        image[user_id] = message_id
+        user = str(user_id)
+        image[user] = message_id
         bot.send_message(user_id, f"{text}", reply_markup=markup)
     else:
         bot.send_message(message)
@@ -358,7 +388,8 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
     photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
     image_id = bot.send_photo(message.chat.id, photo=open(photo_path, 'rb'))
     message_id = image_id.message_id
-    image[user_id] = message_id
+    user = str(user_id)
+    image[user] = message_id
     bot.send_message(user_id, f"{text}", reply_markup=markup)
 
 def change_name_rus(message, message_id):
@@ -381,7 +412,8 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
     photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
     image_id = bot.send_photo(message.chat.id, photo=open(photo_path, 'rb'))
     message_id = image_id.message_id
-    image[user_id] = message_id    
+    user = str(user_id)
+    image[user] = message_id    
     bot.send_message(user_id, f"{text}", reply_markup=markup)
 
 def change_surname_rus(message, message_id):
@@ -404,7 +436,8 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
     photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
     image_id = bot.send_photo(message.chat.id, photo=open(photo_path, 'rb'))
     message_id = image_id.message_id
-    image[user_id] = message_id
+    user = str(user_id)
+    image[user] = message_id
     bot.send_message(user_id, f"{text}", reply_markup=markup)
 
 
