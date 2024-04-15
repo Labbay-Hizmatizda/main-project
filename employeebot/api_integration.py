@@ -12,10 +12,8 @@ def get_employee(user_id):
         else:
             return response.json()
     else:
-        # return [{'Status_code': response.status_code,
-        #                 'Json': response.json()}]
         return None    
-# print(get_employee())
+
 
 def get_cv(user_id):
     response = requests.get(f'{BASE_URL}cvs/?user_id={user_id}')
@@ -27,8 +25,9 @@ def get_cv(user_id):
             return response[0]['media']
     else:
         return response.json() 
+    
+print(get_cv(1231138963))
 
-# print(get_cv(1231138963))
 
 def get_categories():
     response = requests.get(f'{BASE_URL}category')
@@ -37,18 +36,24 @@ def get_categories():
             return None
         else:
             return response.json()
-    else:
-        return response.json()
 
 
-def get_proposals(user_id):
+
+def get_proposals(user_id, which):
     get_id_from = requests.get(f'{BASE_URL}employees/?user_id={user_id}')
     id = get_id_from.json()
     id_value = id[0]['id']
-    response = requests.get(f'{BASE_URL}proposals/?owner_id={id_value}')
-    if response.status_code == 200:
-        return response.json()
+    if which == 'true':
+        response = requests.get(f'{BASE_URL}proposals/?owner_id={id_value}&is_active=True')
+    elif which == 'false':
+        response = requests.get(f'{BASE_URL}proposals/?owner_id={id_value}&is_active=False')
 
+    if response.status_code == 200:
+        if response.json() == []:
+            return None
+        else:
+            return response.json()
+    
  
 def get_lang(user_id):
     response = requests.get(f'{BASE_URL}employees/?user_id={user_id}')
@@ -61,10 +66,8 @@ def get_lang(user_id):
             if id[0]['language'] == 7:
                 return 'ru' 
             return 'uz'
-    else:
-        return response.json()
+
     
-print(get_lang(1231138963))
 
 
 
@@ -96,23 +99,25 @@ def post_employer(user_id, name, surname, phone_number):
                         'Json': response.json()}]
     
 
-def post_proposal(order_id, price, owner_id):
-    get_id_from = requests.get(f'{BASE_URL}employers/?user_id={owner_id}')
+def post_proposal(order_id, price, user_id):
+    get_id_from = requests.get(f'{BASE_URL}employees/?user_id={user_id}')
     id = get_id_from.json()
-    user_id = id[0]['id']
+    print(id)
+    if not id:  # Check if the list is empty
+        return [{'Error': 'No data found for the given user_id'}]
+    
+    owner_id = id[0]['id']
+    print(owner_id)
     data = {
-        'owner_id' : user_id,
-        'order_id' : order_id,
-        'price' : price
+        'owner_id': owner_id,
+        'order_id': order_id,
+        'price': price
     }
     response = requests.post(f'{BASE_URL}proposals/', json=data)
     if response.status_code == 200:
-        return response.json()  
+        return response.json()
     else:
-        print('sv')
-        return [{'Status_code': response.status_code,
-                        'Json': response.json()}]
-
+        return [{'Status_code': response.status_code, 'Json': response.json()}]
 
 def post_passport(user_id, url):
     get_id_from = requests.get(f'{BASE_URL}employees/?user_id={user_id}')
@@ -142,7 +147,6 @@ def post_cv(bio, owner_id):
     if response.status_code == 200:
         return response.json()   
     else:
-        print('sv')
         return [{'Status_code': response.status_code,
                         'Json': response.json()}]
     
@@ -209,6 +213,7 @@ def patch_cv(user_id, value, which):
         return [{'Status_code': response.status_code,
                  'Json': response.json()}]
 
+
 def patch_lang(user_id, which):
     
     if which == 'ru':
@@ -230,12 +235,7 @@ def patch_lang(user_id, which):
     else:
         print(1)
         return [{'Status_code': response.status_code,
-                'Json': response.json()}] 
-
-
-print(patch_lang(1231138963, 'ru'))
-   
-
+                'Json': response.json()}]    
 
 
 # 1231138963
@@ -247,9 +247,10 @@ import time
 
 def stopwatch():
     start_time = time.time()
-    # ------|
+    # print(get_proposals(1231138963, 'true'))
+    # print(get_proposals(1231138963, 'false'))
     end_time = time.time()
     elapsed_time = end_time - start_time
-    print(f"Прошло времени: {elapsed_time:.3f} секунд")
+    print(f"\n\nПрошло времени: {elapsed_time:.3f} секунд")
 
 stopwatch()

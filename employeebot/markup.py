@@ -42,33 +42,23 @@ def change_lang___rus():
     markup.add(lang_rus, lang_uz, back)
     return markup
 
-def cancel_rus():
+def cancel_ru():
     markup = types.InlineKeyboardMarkup(row_width=1)
     cancel = types.InlineKeyboardButton('Отменить ❌', callback_data='cancel_rus')
     markup.add(cancel)
 
     return markup
 
-
-def change_cv_info_rus():
-    markup = types.InlineKeyboardMarkup(row_width=1)
-    change_image = types.InlineKeyboardButton('Изменить Фото ', callback_data='change_phone_num_rus')
-    change_bio = types.InlineKeyboardButton('Изменить биографию', callback_data='change_name_surname_rus')
-    back_cv = types.InlineKeyboardButton('Назад ◀️', callback_data='back_cv')
-    markup.add(change_image, change_bio, back_cv)
-
-
 def proposals_rus():
     markup = types.InlineKeyboardMarkup(row_width=1)
 
-    active_orders = types.InlineKeyboardButton('Отлики в ожидании 📬', callback_data='pending_proposals')
+    active_orders = types.InlineKeyboardButton('Отклики в ожидании 📬', callback_data='pending_proposals')
     proposals_history = types.InlineKeyboardButton('История откликов 🗄', callback_data='proposals_history')
     new_order = types.InlineKeyboardButton('Откликнуться на заказ 📤', callback_data='new_proposal')
-    back = types.InlineKeyboardButton('Назад ◀️', callback_data='back_to_main_menu_rus')
+    back = types.InlineKeyboardButton('Назад ◀️', callback_data='about_us_back_menu')
     markup.add(active_orders, new_order, proposals_history, back)
 
     return markup
-
 
 def pending_proposals_rus():
     markup = types.InlineKeyboardMarkup()
@@ -79,55 +69,70 @@ def pending_proposals_rus():
     return markup
 
 
-def new_order():
-    ...
-
 
 # employer uzbek-------------------------------------------------------------------------------
 
 def uzbek():
     markup = types.InlineKeyboardMarkup(row_width=1)
 
-    about_us = types.InlineKeyboardButton('Biz Haqimizda', callback_data='about_us_uz')
-    my_account = types.InlineKeyboardButton('Mening danniylarim', callback_data='my_account_uz')
-    orders = types.InlineKeyboardButton('Buyurtlamarim', callback_data='orders_uz')
+    about_us = types.InlineKeyboardButton('Biza Haqqimizda ℹ️ ', callback_data='about_us_uz')
+    my_account = types.InlineKeyboardButton('Mening tafsilotlarim 💾', callback_data='my_account_uz')
+    orders = types.InlineKeyboardButton('Arizalar 📜', callback_data='proposals_uz')
 
     markup.add(about_us, my_account, orders)
     return markup
 
+def back_about_us_uz():
+    markup = types.InlineKeyboardMarkup()
 
-def my_account_uz():
-    markup = types.InlineKeyboardMarkup(row_width=1)
-
-    change_phone_number = types.InlineKeyboardButton('Nomerni o\'zgartirish', callback_data='change_phone_num_uz')
-    back = types.InlineKeyboardButton('◀ Orqaga', callback_data='back_uz')
-    markup.add(change_phone_number, back)
-    return markup
-
-
-def change_number_uz():
-    ...
-
-
-def orders_uz():
-    markup = types.InlineKeyboardMarkup(row_width=1)
-
-    active_orders = types.InlineKeyboardButton('Faol buyurtmalar', callback_data='active_orders_uz')
-    new_order = types.InlineKeyboardButton('Yangi buyurtma yaratish', callback_data='new_order_uz')
-    back = types.InlineKeyboardButton('◀ Orqaga', callback_data='back_uz')
-    markup.add(active_orders, new_order, back)
-
-    return markup
-
-
-def active_orders_uz():
-    markup = types.InlineKeyboardMarkup(row_width=1)
-
-    back = types.InlineKeyboardButton('◀ Orqaga', callback_data='back_orders_uz')
+    back = types.InlineKeyboardButton('Orqaga ◀️', callback_data='about_us_back_menu_uz')
     markup.add(back)
 
     return markup
 
+def my_account_uz():
+    markup = types.InlineKeyboardMarkup(row_width=1)
 
-def new_order_uz():
-    ...
+    change_photo = types.InlineKeyboardButton('Rasimni o\'zgartirish 🖼', callback_data='change_photo_uz')
+    change_phone_number = types.InlineKeyboardButton('Nomerni o\'zgartirish ☎️', callback_data='change_phonenumber_uz')
+    change_name = types.InlineKeyboardButton('Isimni o\'zgartirish 👤', callback_data='change_name_uz')
+    change_surname = types.InlineKeyboardButton('Sharifni o\'zgartirish 👤', callback_data='change_surname_uz')
+    change_language = types.InlineKeyboardButton('Tilni o\'zgartirish 🌍', callback_data='change_language_uz')
+    back = types.InlineKeyboardButton('Orqaga ◀️', callback_data='back_to_main_menu_uz')
+    markup.add(change_photo, change_name, change_surname, change_phone_number, change_language, back)
+    return markup
+
+def change_lang___uz():
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    lang_rus = types.InlineKeyboardButton('Русский 🇷🇺 ', callback_data='identify_lang_rus')
+    lang_uz = types.InlineKeyboardButton('O\'zbek tili 🇺🇿 ', callback_data='identify_lang_uz')
+    back = types.InlineKeyboardButton('Bekor qilish ❌', callback_data='cancel_uz')
+    
+    markup.add(lang_rus, lang_uz, back)
+    return markup
+
+def cancel_uz():
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    cancel = types.InlineKeyboardButton('Bekor qilish ❌', callback_data='cancel_uz')
+    markup.add(cancel)
+
+    return markup
+
+def proposals_uz():
+    markup = types.InlineKeyboardMarkup(row_width=1)
+
+    active_orders = types.InlineKeyboardButton('Mening Takliflarim 📬', callback_data='pending_proposals_uz')
+    proposals_history = types.InlineKeyboardButton('Takliflar tarixi🗄', callback_data='proposals_history_uz')
+    new_order = types.InlineKeyboardButton('Taklif qoldirish 📤', callback_data='new_proposal_uz')
+    back = types.InlineKeyboardButton('Orqaga ◀️', callback_data='about_us_back_menu_uz')
+    markup.add(active_orders, new_order, proposals_history, back)
+
+    return markup
+
+def pending_proposals_uz():
+    markup = types.InlineKeyboardMarkup()
+
+    back = types.InlineKeyboardButton('Orqaga ◀️', callback_data='back_proposals_uz')
+    markup.add(back)
+
+    return markup
