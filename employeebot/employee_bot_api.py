@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from markup import *
 from api_integration import *
 
-token = '6956163861:AAHiedP7PYOWS-QHeLSqyhGtJsm5aSkFrE8'
+token = '6956163861:AAHe3z8okiW3LpA4mVJnMqzvyp84IKoLALc'
 bot = telebot.TeleBot(token)
 
 deletion = []
