@@ -6,8 +6,8 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from markup import *
 from api_integration import *
-
-token = '6956163861:AAHe3z8okiW3LpA4mVJnMqzvyp84IKoLALc'
+# 6890785425:AAHJuDftXxnKdr5VhVQewZx4XcTvMV3DKD0
+token = '7150191995:AAG-bNdv-1fxsF-Jbc-EvEGYagRcSSxOCYo'
 bot = telebot.TeleBot(token)
 
 deletion = []
@@ -467,24 +467,23 @@ def handle_add_proposal(message):
         message__id = bot.send_message(user_id, "Taklif qoldirish uchun, zakazni IDsini yozing!")
 
     message_id = message__id.id
-    bot.register_next_step_handler(message__id, handle_id, message_id=message_id)
+    bot.register_next_step_handler(message__id, handle_id, message_id=message_id, language=lang)
 
-def handle_id(message, message_id):
+def handle_id(message, message_id, language):
     user_id = message.from_user.id
     order_id = message.text
     proposals[user_id]['order_id'] = order_id
 
     delete__message(user_id, message_id)
     delete__message(user_id, message.id)
-    lang = get_lang(user_id)
-    if lang == 'ru':
+    if language == 'ru':
         message__id = bot.send_message(user_id, "Напишите сумму денег, которую вы хотите получить после успешного выполнения заказа!")
-    elif lang == 'uz':
+    elif language == 'uz':
         message__id = bot.send_message(user_id, "Buyurtmani muvaffaqiyatli bajarganingizdan so'ng olmoqchi bo'lgan miqdorni kiriting!")
     message_id = message__id.id
-    bot.register_next_step_handler(message, inset_to_db, message_id=message_id)
+    bot.register_next_step_handler(message, inset_to_db, message_id=message_id, language=language)
 
-def inset_to_db(message, message_id):
+def inset_to_db(message, message_id, language):
     user_id = message.from_user.id
     price = message.text
     proposals[user_id]['price'] = price
@@ -492,8 +491,7 @@ def inset_to_db(message, message_id):
     proposals_data = proposals[user_id]
     print(post_proposal(proposals_data['order_id'], proposals_data['price'], user_id))
     
-    lang = get_lang(user_id)
-    if lang == 'ru':
+    if language == 'ru':
         loading_message = bot.edit_message_text(chat_id=user_id, message_id=message_id, text="Подождите, отправляем ваш запрос ...")
 
         try:
@@ -519,7 +517,7 @@ def inset_to_db(message, message_id):
 
         markup = proposals_rus()
         bot.edit_message_text(chat_id=message.chat.id, message_id=loading_message.id, text="Тут все, что связано с работой.\n Нажмите одну из кнопок, чтобы посмотреть соответствующую функцию", reply_markup=markup)
-    if lang == 'uz':
+    if language == 'uz':
         loading_message = bot.edit_message_text(chat_id=user_id, message_id=message_id, text="Kuting, taklif yuborilmoqda ...")
         
         try:
