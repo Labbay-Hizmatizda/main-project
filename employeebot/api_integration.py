@@ -25,7 +25,7 @@ def get_cv(user_id):
             return response[0]['media']
     else:
         return response.json() 
-    
+        
 
 def get_categories():
     response = requests.get(f'{BASE_URL}category')
@@ -34,7 +34,6 @@ def get_categories():
             return None
         else:
             return response.json()
-
 
 
 def get_proposals(user_id, which):
@@ -51,7 +50,7 @@ def get_proposals(user_id, which):
             return None
         else:
             return response.json()
-    
+
  
 def get_lang(user_id):
     response = requests.get(f'{BASE_URL}employees/?user_id={user_id}')
@@ -134,11 +133,10 @@ def post_passport(user_id, url):
                         'Json': response.json()}]   
 
 
-def post_cv(bio, owner_id):
+def post_cv(image, bio, owner_id):
     data = {
-        'media': 'media/cv/cv_image.jpg',
+        'media': image,
         'bio': bio,
-        'rating': 0,
         'owner_id': owner_id,
     }
     response = requests.post(f'{BASE_URL}cvs/', json=data)
@@ -148,7 +146,6 @@ def post_cv(bio, owner_id):
         return [{'Status_code': response.status_code,
                         'Json': response.json()}]
     
-
 
 
 
