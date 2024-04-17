@@ -14,7 +14,7 @@ from api_integration import *
 
 
 # FIX ALL THIS !!!!!!!!                                                    #
-# TODO |>1<| correct uploading( get code from change_image() )| 489 field  #
+# TODO |>1<| add POSTing CV( get code from change_image() )| 489 field  #
 # TODO |>2<| connect add_cv logic to the addaptive markups in my_info      #
 # TODO |>3<| after ending add_cv logics                                    #
 # TODO |>4<| add proposal canceling                                        #
@@ -727,7 +727,6 @@ def change_phonenumber_rus(message, message_id, lang):
     delete__message(user_id, message_id)
     delete__message(user_id, message.id)
 
-    print(patch_employees(user_id, value, 'phone'))
 
     response = get_employee(user_id)
     
@@ -755,6 +754,7 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
             '''
         markup = my_account_uz()
         bot.send_message(user_id, f"{text}\n\nNima qilmohchisiz :......", reply_markup=markup)
+    print(patch_employees(user_id, value, 'phone'))
 
 def change_name_rus(message, message_id, lang):
     user_id = message.from_user.id
@@ -763,7 +763,6 @@ def change_name_rus(message, message_id, lang):
     delete__message(user_id, message_id)
     delete__message(user_id, message.id)
 
-    print(patch_employees(user_id, value, 'name'))
 
     response = get_employee(user_id)
     directory = os.path.join("media", "cv_photo", str(user_id))
@@ -790,6 +789,7 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
             '''
         markup = my_account_uz()
         bot.send_message(user_id, f"{text}\n\nNima qilmohchisiz :......", reply_markup=markup)
+    print(patch_employees(user_id, value, 'name'))
 
 def change_surname_rus(message, message_id, lang):
     user_id = message.from_user.id
@@ -798,7 +798,6 @@ def change_surname_rus(message, message_id, lang):
     delete__message(user_id, message_id)   
     delete__message(user_id, message.id)
 
-    print(patch_employees(user_id, value, 'surname'))
 
     response = get_employee(user_id)
     directory = os.path.join("media", "cv_photo", str(user_id))
@@ -825,6 +824,7 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
             '''
         markup = my_account_uz()
         bot.send_message(user_id, f"{text}\n\nNima qilmohchisiz :......", reply_markup=markup)
+    print(patch_employees(user_id, value, 'surname'))
 
 
 
