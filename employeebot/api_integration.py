@@ -55,16 +55,23 @@ def get_proposals(user_id, which):
 def get_lang(user_id):
     response = requests.get(f'{BASE_URL}employees/?user_id={user_id}')
     id = response.json()
-
+    try:
+        id_value = id[0]['language']
+    except:
+        ...
+    
     if response.status_code == 200:
-        if id[0]['language'] == None:
+        
+        if response.json() == []:
+            return []
+        elif id_value == []:
             return None
-        else:
-            if id[0]['language'] == 7:
+        elif id_value == 7 or id_value == 8:
+            if id_value == 7:
                 return 'ru' 
             return 'uz'
 
-    
+print(get_lang(1231138963))
 
 
 

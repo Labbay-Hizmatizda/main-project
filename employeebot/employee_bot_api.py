@@ -10,20 +10,23 @@ from api_integration import *
 # @labbay_employer_bot
 
 
+# fix                       IN PRIORITY                                
+# TODO |>!<| my_account(131) if no user:   output | log_in button | text='Вы еще не регались поэтому вам эта функция не доступна, нажмите на кнопку зарегайтесь' 
+# TODO |>!<| create a log_in function, add basic values of employee
 
 
 
 # FIX ALL THIS !!!!!!!!                                                    #
-# TODO |>1<| add POSTing CV( get code from change_image() )| 489 field  #
+# TODO |>1<| add POSTing CV( get code from change_image() )| 489 field     #
 # TODO |>2<| connect add_cv logic to the addaptive markups in my_info      #
 # TODO |>3<| after ending add_cv logics                                    #
 # TODO |>4<| add proposal canceling                                        #
-# TODO |>6<| add rating and bio insight of the my_account                      #
+# TODO |>6<| add rating and bio insight of the my_account                  #
 # TODO |>5<| add markups in active proposals by ID                         #
 # TODO |>6<| add output of proposal detail and order's information         #
 
 # FIX LATER                                                                #
-# TODO |>7<| THINK ABOUT NOTIFICATION LOGICS                    #FIX       #
+# TODO |>7<| THINK ABOUT NOTIFICATION LOGICS               #FIX            #
 # TODO |>8<|                                                               #
 
 
@@ -44,33 +47,34 @@ def start(message):
     user_id = message.from_user.id
     print(user_id)
     lang = get_lang(user_id)
-    if lang != None:
-        if lang == 'ru':
-            print(patch_lang(user_id, 'ru'))
+    if lang != None or lang != []:
+        if lang == 'ru':    
 
             markup = russian()
-            message_smth = bot.send_message(message.chat.id, 'ㅤㅤㅤㅤ', reply_markup=ReplyKeyboardRemove())
+            message_empty = bot.send_message(message.chat.id, 'ㅤ', reply_markup=ReplyKeyboardRemove())
 
-            delete__message(chat_id=message.chat.id, message_id=message_smth.id)
-            bot.send_message(chat_id=message.chat.id,
-                                text='Главный меню:\n/add_proposal откликнуться на заказ\n\n\n', reply_markup=markup)
-        if lang == 'uz':
-            print(patch_lang(user_id, 'uz'))
+            delete__message(chat_id=message.chat.id, message_id=message_empty.id)
+            bot.send_message(message.chat.id,
+                                  'Главный меню:\n/add_proposal откликнуться на заказ\n\n\n', reply_markup=markup)
+            print(patch_lang(user_id, 'ru'))
+            
+        elif lang == 'uz':
             markup = uzbek()
-            message_smth = bot.send_message(message.chat.id, 'ㅤㅤㅤㅤ', reply_markup=ReplyKeyboardRemove())
+            message_empty = bot.send_message(message.chat.id, 'ㅤ', reply_markup=ReplyKeyboardRemove())
+            
+            delete__message(chat_id=message.chat.id, message_id=message_empty.id)
+            bot.send_message(message.chat.id,
+                                  'Glavniy menyu:\n\n/add_proposal - Otkliknutsa na zakaz\n\n\n', reply_markup=markup)
+            print(patch_lang(user_id, 'uz'))
+        else:
+            markup = types.InlineKeyboardMarkup()
+            lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_rus')
+            lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='lang_uz')
+            markup.add(lang_rus, lang_uz)
 
-            delete__message(chat_id=message.chat.id, message_id=message_smth.id)
-            bot.send_message(chat_id=message.chat.id,
-                                text='Glavniy menyu:\n\n/add_proposal - Otkliknutsa na zakaz\n\n\n', reply_markup=markup)
-    elif lang == None:
-        markup = types.InlineKeyboardMarkup()
-        lang_rus = types.InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_rus')
-        lang_uz = types.InlineKeyboardButton('🇺🇿 O\'zbek tili', callback_data='lang_uz')
-
-        markup.add(lang_rus, lang_uz)
-        message_smth = bot.send_message(message.chat.id, 'ㅤㅤㅤㅤ', reply_markup=ReplyKeyboardRemove())
-        delete__message(user_id, message_smth.id)
-        bot.send_message(message.chat.id, "Выберите язык 🌍\nTilni tanlang 🌍", reply_markup=markup)
+            message_smth = bot.send_message(message.chat.id, 'ㅤ', reply_markup=ReplyKeyboardRemove())
+            delete__message(user_id, message_smth.id)
+            bot.send_message(message.chat.id, "Выберите язык 🌍\nTilni tanlang 🌍", reply_markup=markup)
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -81,7 +85,10 @@ def callback_query(call):
     
     if call.data == 'lang_rus':
         user_id = call.from_user.id
-        patch_lang(user_id, 'ru')
+        try:
+            patch_lang(user_id, 'ru')
+        except:
+            ...
         markup = russian()
         message_smth = bot.send_message(call.message.chat.id, 'ㅤㅤㅤㅤ', reply_markup=ReplyKeyboardRemove())
         
@@ -97,29 +104,33 @@ def callback_query(call):
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Наш сайт ⏬", reply_markup=markup)
     
     elif call.data == 'my_account_rus' or call.data == 'cancel_rus':
-        print(image)
-
         user_id = call.from_user.id
-        delete__message(user_id, call.message.id)
-        markup = my_account_rus()
-        response = get_employee(user_id)
-        text = f'''
-ID : {response[0]['user_id']}
-Имя : {response[0]['name']}
-Фамилия : {response[0]['surname']}
-Телефон номера : +{response[0]['phone_number']}\n\n
-        '''
-        directory = os.path.join("media", "cv_photo", str(user_id))
-        photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
+        
         try:
-            image_id = bot.send_photo(call.message.chat.id, photo=open(photo_path, 'rb'))
-            message_id = image_id.message_id
-            user = str(user_id)
-            image[user] = message_id
+            delete__message(user_id, call.message.id)
+            markup = my_account_rus()
+            response = get_employee(user_id)
+            text = f'''
+    ID : {response[0]['user_id']}
+    Имя : {response[0]['name']}
+    Фамилия : {response[0]['surname']}
+    Телефон номера : +{response[0]['phone_number']}\n\n
+            '''
+            directory = os.path.join("media", "cv_photo", str(user_id))
+            photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
+            try:
+                image_id = bot.send_photo(call.message.chat.id, photo=open(photo_path, 'rb'))
+                message_id = image_id.message_id
+                user = str(user_id)
+                image[user] = message_id
+            except:
+                ...
+            bot.send_message(call.message.chat.id,
+                                f"{text}Какое действие вы хотите сделать :......", reply_markup=markup)
+            
         except:
-            ...
-        bot.send_message(call.message.chat.id,
-                              f"{text}Какое действие вы хотите сделать :......", reply_markup=markup)
+            # FIX                     
+            bot.send_message(call.message.chat.id, f"{text}Какое действие вы хотите сделать :......")
 
     elif call.data == 'change_photo':
         user_id = call.from_user.id
