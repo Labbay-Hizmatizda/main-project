@@ -8,4 +8,8 @@ for s in range(rating):
 n = 5 - rating
 for s in range(n):
     star += '🌑'
-print(star)
+# print(star)
+
+m = 'XX-XXX-XX-XX'
+m = m.replace('-', '')
+print(m)

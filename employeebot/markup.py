@@ -33,6 +33,17 @@ def my_account_rus():
     markup.add(change_photo, change_name, change_surname, change_phone_number, change_language, back)
     return markup
 
+def authorizing():
+    markup = types.InlineKeyboardMarkup(row_width=1)
+
+    login = types.InlineKeyboardButton('Авторизоваться', callback_data='login')
+    registrate = types.InlineKeyboardButton('Зарегистрироваться', callback_data='registrate')
+    back = types.InlineKeyboardButton('Назад ◀️', callback_data='back_to_main_menu_rus')
+
+    markup.add(login, registrate, back)
+
+    return markup
+
 def change_lang___rus():
     markup = types.InlineKeyboardMarkup(row_width=1)
     lang_rus = types.InlineKeyboardButton('Русский 🇷🇺 ', callback_data='identify_lang_rus')
@@ -100,6 +111,17 @@ def my_account_uz():
     change_language = types.InlineKeyboardButton('Tilni o\'zgartirish 🌍', callback_data='change_language_uz')
     back = types.InlineKeyboardButton('Orqaga ◀️', callback_data='back_to_main_menu_uz')
     markup.add(change_photo, change_name, change_surname, change_phone_number, change_language, back)
+    return markup
+
+def authorizing_uz():
+    markup = types.InlineKeyboardMarkup(row_width=1)
+
+    login = types.InlineKeyboardButton('Kirish', callback_data='login_uz')
+    registrate = types.InlineKeyboardButton('Ro\'yxatdan o\'tish', callback_data='registrate_uz')
+    back = types.InlineKeyboardButton('Orqaga ◀️', callback_data='back_to_main_menu_uz')
+
+    markup.add(login, registrate, back)
+
     return markup
 
 def change_lang___uz():

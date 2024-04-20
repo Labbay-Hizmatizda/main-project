@@ -14,6 +14,7 @@ def get_employee(user_id):
     else:
         return None    
 
+print(get_employee(1231138963))
 
 def get_cv(user_id):
     response = requests.get(f'{BASE_URL}cvs/?user_id={user_id}')
@@ -51,6 +52,9 @@ def get_proposals(user_id, which):
         else:
             return response.json()
 
+# data = get_proposals(1231138963, 'true')
+# num_items = len(data)
+# print("Number of items in the list:", num_items)
  
 def get_lang(user_id):
     response = requests.get(f'{BASE_URL}employees/?user_id={user_id}')
@@ -71,7 +75,7 @@ def get_lang(user_id):
                 return 'ru' 
             return 'uz'
 
-print(get_lang(1231138963))
+# print(get_lang(1231138963))
 
 
 
@@ -86,16 +90,17 @@ print(get_lang(1231138963))
 
 
 
-def post_employer(user_id, name, surname, phone_number):
+def post_employee(user_id, name, surname, phone_number, language):
 
     data = {
         'user_id': user_id,
         'name': name,
         'surname': surname,
         'phone_number': phone_number,
+        'language': language,
     }
 
-    response = requests.post(f'{BASE_URL}employers/', json=data)
+    response = requests.post(f'{BASE_URL}employees/', json=data)
     if response.status_code == 200:
         return response.json()  
     else:
