@@ -21,16 +21,23 @@ def back_about_us():
 
     return markup
 
-def my_account_rus():
-    markup = types.InlineKeyboardMarkup(row_width=1)
+def my_account_rus(is_exists):
+    markup = types.InlineKeyboardMarkup(row_width=2)
+    if is_exists == True:
+        change_photo = types.InlineKeyboardButton('✏️ Фото 🖼', callback_data='change_photo')
+        change_bio = types.InlineKeyboardButton('Изменить биографию ', callback_data='change_bio')
+        markup.add(change_photo)
+        markup.add(change_bio)
+    else:
+        add_cv = types.InlineKeyboardButton('Создать резюме 🪪', callback_data='add_cv')
+        markup.add(add_cv)
 
-    change_photo = types.InlineKeyboardButton('Изменить фото 🖼', callback_data='change_photo')
     change_phone_number = types.InlineKeyboardButton('Изменить номер ☎️', callback_data='change_phonenumber_rus')
     change_name = types.InlineKeyboardButton('Изменить имя 👤', callback_data='change_name_rus')
     change_surname = types.InlineKeyboardButton('Изменить фамилию 👤', callback_data='change_surname_rus')
     change_language = types.InlineKeyboardButton('Изменить язык 🌍', callback_data='change_language_rus')
     back = types.InlineKeyboardButton('Назад ◀️', callback_data='back_to_main_menu_rus')
-    markup.add(change_photo, change_name, change_surname, change_phone_number, change_language, back)
+    markup.add(change_name, change_surname, change_phone_number, change_language, back)
     return markup
 
 def authorizing():
