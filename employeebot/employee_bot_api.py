@@ -16,9 +16,6 @@ from api_integration import *
 
 
 # FIX ALL THIS !!!!!!!!                                                    #
-# TODO |>1<| add POSTing CV( get code from change_image() )| 489 field     #
-# TODO |>2<| connect add_cv logic to the addaptive markups in my_info      #
-# TODO |>3<| after ending add_cv logics                                    #
 # TODO |>4<| add proposal canceling                                        #
 # TODO |>6<| add rating and bio insight of the my_account                  #
 # TODO |>5<| add markups in active proposals by ID                         #
@@ -27,8 +24,6 @@ from api_integration import *
 # FIX LATER                                                                #
 # TODO |>7<| THINK ABOUT NOTIFICATION LOGICS               #FIX            #
 # TODO |>8<|                                                               #
-
-
 
 
 
@@ -42,6 +37,7 @@ registration = {}
 cvs = {}
 image = {}
 proposal_image=0
+
 
 @bot.message_handler(commands=['start'])
 def start(message): 
@@ -96,20 +92,20 @@ def callback_query(call):
         bot.delete_message(chat_id=call.message.chat.id, message_id=message_smth.id)
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text='Главный меню:\n/add_proposal откликнуться на заказ\n\n\n', reply_markup=markup)
-    
+# --------------------------------------------
     elif call.data == 'about_us_rus':
         markup = types.InlineKeyboardMarkup()
         url = types.InlineKeyboardButton(text='Наш сайт ', url='t.me/labbay_employee_bot/LabbayHizmat') ;
         back = types.InlineKeyboardButton('◀ Назад', callback_data='about_us_back_menu')
         markup.add(url, back)
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Наш сайт ⏬", reply_markup=markup)
-    
+# --------------------------------------------
     elif call.data == 'my_account_rus' or call.data == 'cancel_rus':
         user_id = call.from_user.id
         response = get_employee(user_id)
         if response != None:
             delete__message(user_id, call.message.id)
-            markup = my_account_rus(is_exists=True)
+
             text = f'''
     ID : {response[0]['user_id']}
 Имя : {response[0]['name']}
@@ -125,6 +121,11 @@ def callback_query(call):
                 image[user] = message_id
             except:
                 ...
+
+            if get_cv(user_id) == True:
+                markup = my_account_rus(is_exists=True)
+            else:
+                markup = my_account_rus(is_exists=None)
             bot.send_message(call.message.chat.id,
                                 f"{text}Какое действие вы хотите сделать :......", reply_markup=markup)
             
@@ -143,6 +144,25 @@ def callback_query(call):
 
     elif call.data == 'registrate':   ...
 
+    elif call.data == 'add_cv_rus':
+        user_id = call.from_user.id
+        cvs[user_id] = {}
+        cvs[user_id]['owner_id'] = user_id
+        lang = get_lang(user_id)
+
+        chat_id=call.message.chat.id
+        message_id=call.message.id
+        
+        user = str(user_id)
+        try:
+            delete__message(user_id, image[user])
+        except:
+            ...
+
+        message__id = bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=f'Отправьте ваше новое фото')
+        message_id = message__id.id
+        bot.register_next_step_handler(message__id, get_photo, message_id=message_id, language=lang)
+    
     elif call.data == 'change_photo':
         user_id = call.from_user.id
         chat_id=call.message.chat.id
@@ -216,11 +236,8 @@ def callback_query(call):
 
     elif call.data == 'identify_lang_rus':
         user_id = call.from_user.id
-        markup = my_account_rus()
         message_id=call.message.id
         delete__message(user_id, message_id)
-
-
 
         response = get_employee(user_id)
         text = f'''
@@ -239,8 +256,12 @@ ID : {response[0]['user_id']}
         except:
             ...
 
+        if get_cv(user_id) == True:
+            markup = my_account_rus(is_exists=True)
+        else:
+            markup = my_account_rus(is_exists=None)      
         bot.send_message(chat_id=call.message.chat.id,
-                              text=f"{text}\n\nКакое действие вы хотите сделать :......", reply_markup=markup)
+                            text=f"{text}\n\nКакое действие вы хотите сделать :......", reply_markup=markup)
         print(patch_lang(user_id, 'ru'))
 
     elif call.data == 'back_to_main_menu_rus':
@@ -268,7 +289,7 @@ ID : {response[0]['user_id']}
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text='Главный меню:\n     /kyc для верификации\n     /add_proposal посмотреть заказы'.format(
                                   call.from_user.first_name), reply_markup=markup)
-    
+# --------------------------------------------
     elif call.data == 'proposals_rus' or call.data == 'back_orders' or call.data == 'back_proposals':
         user_id = call.from_user.id
         response = get_employee(user_id)
@@ -343,22 +364,22 @@ ID : {response[0]['user_id']}
         back = types.InlineKeyboardButton('Orqaga ◀️', callback_data='about_us_back_menu_uz')
         markup.add(url, back)
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Bizning sayt⏬", reply_markup=markup)
-    
+# -----------------------------------------------------------------------------------   
     elif call.data == 'my_account_uz' or call.data == 'cancel_uz':
         user_id = call.from_user.id
         response = get_employee(user_id)
         if response != None:
+
             delete__message(user_id, call.message.id)
-            print(response)
+
             text = f'''
         User ID : {response[0]['user_id']}
-    Isim : {response[0]['name']}
-    Sharif : {response[0]['surname']}
-    Telefon nomer : +{response[0]['phone_number']}\n\n
+Isim : {response[0]['name']}
+Sharif : {response[0]['surname']}
+Telefon nomer : +{response[0]['phone_number']}\n\n
                 '''
-            directory = os.path.join("media", "cv_photo", str(user_id
-                                                              
-                                                              ))
+            
+            directory = os.path.join("media", "cv_photo", str(user_id))
             photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
             try:
                 image_id = bot.send_photo(call.message.chat.id, photo=open(photo_path, 'rb'))
@@ -367,9 +388,13 @@ ID : {response[0]['user_id']}
                 image[user] = message_id
             except:
                 ...
-            markup = my_account_uz()
-            bot.send_message(user_id,
+            if get_cv(user_id) == True:
+                markup = my_account_uz(is_exists=True)
+            else:
+                markup = my_account_uz(is_exists=None)
+            bot.send_message(call.message.chat.id,
                                 f"{text}\n\nNma qilmohchisiz :......", reply_markup=markup)
+            
         else:  
             markup = authorizing_uz()
             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text="Bu funksiyani ishlatish uchun, iltimos akkauntingizga kiring yoki yengi yarating!", reply_markup=markup)
@@ -384,6 +409,25 @@ ID : {response[0]['user_id']}
         bot.register_next_step_handler(message__id, LOGIN_handle_name, message_id=message_id, language='uz')
 
     elif call.data == 'registrate_uz':   ...
+
+    elif call.data == 'add_cv_uz':
+        user_id = call.from_user.id
+        cvs[user_id] = {}
+        cvs[user_id]['owner_id'] = user_id
+        lang = get_lang(user_id)
+
+        chat_id=call.message.chat.id
+        message_id=call.message.id
+        
+        user = str(user_id)
+        try:
+            delete__message(user_id, image[user])
+        except:
+            ...
+
+        message__id = bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=f'Отправьте ваше новое фото')
+        message_id = message__id.id
+        bot.register_next_step_handler(message__id, get_photo, message_id=message_id, language=lang)
 
     elif call.data == 'change_photo_uz':
         user_id = call.from_user.id
@@ -471,9 +515,13 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
         except:
             ...
 
-        markup = my_account_uz()
+        if get_cv(user_id) == True:
+            markup = my_account_uz(is_exists=True)
+        else:
+            markup = my_account_uz(is_exists=None)
+        bot.send_message(call.message.chat.id,
+                            f"{text}\n\nNma qilmohchisiz :......", reply_markup=markup)
 
-        bot.send_message(user_id, f"{text}\n\nNma qilmohchisiz :......", reply_markup=markup)
 
     elif call.data == 'back_to_main_menu_uz':
         markup = uzbek()
@@ -500,7 +548,7 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id,
                               text='Glavniy menyu:\n\n/add_proposal - Otkliknutsa na zakaz\n\n\n'.format(
                                   call.from_user.first_name), reply_markup=markup)
-    
+# -----------------------------------------------------------------------------------   
     elif call.data == 'proposals_uz' or call.data == 'back_orders_uz' or call.data == 'back_proposals_uz':
         user_id = call.from_user.id
 
@@ -555,16 +603,7 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
         deletion.append(sent_message.id)
         bot.register_next_step_handler(call.message, handle_id, message_id=message_id)
 
-'''
-id = image.get(user_id)
 
-if id:
-    delete__message(user_id, id)
-    image[user_id] = None
-elif id == None:
-    pass
-    
-'''
 
 
 def LOGIN_handle_name(message, message_id, language):
@@ -682,36 +721,69 @@ def login_insert_to_db(message, message_id, language):
         
 
 
-
 @bot.message_handler(commands=['cv'])
-def add_cv(message):
+def add_cv(message, another=None):
+    if another == None:
+        user_id = message.from_user.id
+        cvs[user_id] = {}
+        cvs[user_id]['owner_id'] = user_id
+        lang = get_lang(user_id)
+        if lang == 'ru':
+            message__id = bot.send_message(user_id, "Пожалуйста отправьте свою фотографию!")
+            message_id = message__id.id
+        elif lang == 'uz':
+            message__id = bot.send_message(user_id, "Iltimos ozingizni rasimingizni tashlang!")
+            message_id = message__id.id
 
+        bot.register_next_step_handler(message__id, get_photo, message_id=message_id, language=lang)
+    else:
+        user_id = message.from_user.id
+        lang = get_lang(user_id)
+        if lang == 'ru':
+            message__id = bot.send_message(user_id, "Пожалуйста отправьте свою фотографию!")
+            message_id = message__id.id
+        elif lang == 'uz':
+            message__id = bot.send_message(user_id, "Iltimos ozingizni rasimingizni tashlang!")
+            message_id = message__id.id
+        bot.register_next_step_handler(message__id, get_photo, message_id=message_id, language=lang)
+
+def get_photo(message, message_id, language):
     user_id = message.from_user.id
-    proposals[user_id] = {}
-    proposals[user_id]['owner_id'] = user_id
-    lang = get_lang(user_id)
-    if lang == 'ru':
-        message__id = bot.send_message(user_id, "Пожалуйста отправьте свою фотографию!")
-    elif lang == 'uz':
-        message__id = bot.send_message(user_id, "Iltimos ozingizni rasimingizni tashlang!")
 
-    message_id = message__id.id
-    bot.register_next_step_handler(message__id, bio, message_id=message_id, language=lang)
+    directory = os.path.join("media", "cv_photo", str(user_id))
 
-def bio(message, message_id, language):
-    user_id = message.from_user.id
-    image = message.text
-    cvs[user_id]['image'] = image
+    os.makedirs(directory, exist_ok=True)
+    try:
+        file_id = message.photo[-1].file_id
+        file_info = bot.get_file(file_id)
+        file_path = file_info.file_path
+        downloaded_file = bot.download_file(file_path)
 
-    # =(user_id, message_id)
-    delete__message(user_id, message.id)
+        image_path = os.path.join(directory, f'{str(user_id)}.jpg')
+        with open(image_path, 'wb') as photo:
+            photo.write(downloaded_file)
+    except:
+        ...
+    if message.photo:
+        # Assuming you want the largest photo
+        image = message.photo[-1].file_id
+        cvs[user_id] = {'image': image}
 
-    if language == 'ru':
-        message__id = bot.edit_message_text(chat_id=user_id, message_id=message_id,text="Введите сумму денег за которую вы бы хотели получить, после выполнения работы удачно!")
-    elif language == 'uz':
-        message__id = bot.edit_message_text(chat_id=user_id, message_id=message_id,text="Buyurtmani muvaffaqiyatli bajarganingizdan so'ng olmoqchi bo'lgan miqdorni kiriting!")
-    message_id = message__id.id
-    bot.register_next_step_handler(message, cv_insert_to_db, message_id=message_id, language=language)
+        delete__message(user_id, message.id)
+
+        if language == 'ru':
+            message_text = "Напишите коротко о себе "
+        elif language == 'uz':
+            message_text = "Ozingiz haqingizda qisqa yozing"
+
+        message__id = bot.edit_message_text(chat_id=user_id, message_id=message_id, text=message_text)
+        message_id = message__id.id
+        bot.register_next_step_handler(message, cv_insert_to_db, message_id=message_id, language=language)
+    else:
+        if language == 'ru':
+            add_cv(message, another=True)
+        elif language == 'uz':
+            add_cv(message, another=True)
 
 def cv_insert_to_db(message, message_id, language):
     user_id = message.from_user.id
@@ -719,8 +791,7 @@ def cv_insert_to_db(message, message_id, language):
     cvs[user_id]['bio'] = bio
     print(cvs)
     cvs_data = cvs[user_id]
-    print(post_cv(cvs_data['image'], cvs_data['bio'], user_id))
-    
+
     if language == 'ru':
         loading_message = bot.edit_message_text(chat_id=user_id, message_id=message_id, text="Подождите, сохроняется ...")
 
@@ -732,22 +803,45 @@ def cv_insert_to_db(message, message_id, language):
         running = True
         while running:
             start_time = time.time()
+            animation = ["Подождите, сохроняется .", "Подождите, сохроняется ..", "Подождите, сохроняется ..."]
 
             while time.time() - start_time < 2:
-                time.sleep(0.1)
-                bot.edit_message_text("Подождите, сохроняется .", message.chat.id, message_id=loading_message.message_id)
-                time.sleep(0.1)
-                bot.edit_message_text("Подождите, сохроняется ..", message.chat.id, message_id=loading_message.message_id)
-                time.sleep(0.1)
-                bot.edit_message_text("Подождите, сохроняется ...", message.chat.id, message_id=loading_message.message_id)
+                for frame in animation:
+                    bot.edit_message_text(frame, message.chat.id, message_id=loading_message.message_id)
+                    time.sleep(0.1)
             running = False
 
-        message_id = bot.edit_message_text(chat_id=message.chat.id, message_id=loading_message.id, text="Отклик отправлен ✔️")
+        done_message = bot.edit_message_text(chat_id=message.chat.id, message_id=loading_message.id, text="Отклик отправлен ✅")
         time.sleep(1)
 
-        markup = proposals_rus()
-        bot.edit_message_text(chat_id=message.chat.id, message_id=loading_message.id, text="Тут все, что связано с работой.\n Нажмите одну из кнопок, чтобы посмотреть соответствующую функцию", reply_markup=markup)
-    if language == 'uz':
+        delete__message(user_id, done_message.id)
+
+        response = get_employee(user_id)
+
+        text = f'''
+ID : {response[0]['user_id']}
+Имя : {response[0]['name']}
+Фамилия : {response[0]['surname']}
+Телефон номера : +{response[0]['phone_number']}\n\n
+        '''
+        try:
+            directory = os.path.join("media", "cv_photo", str(user_id))
+            photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
+            image_id = bot.send_photo(message.chat.id, photo=open(photo_path, 'rb'))
+            message_id = image_id.message_id
+            user = str(user_id)
+            image[user] = message_id
+        except:
+            ...
+
+        if get_cv(user_id) == True:
+            markup = my_account_rus(is_exists=True)
+        else:
+            markup = my_account_rus(is_exists=None)
+        bot.send_message(message.chat.id, f"{text}Какое действие вы хотите сделать :......", reply_markup=markup)
+        print(post_cv(cvs_data['image'], cvs_data['bio'], user_id))
+
+    elif language == 'uz':
         loading_message = bot.edit_message_text(chat_id=user_id, message_id=message_id, text="Kuting, taklif yuborilmoqda ...")
         
         try:
@@ -758,21 +852,38 @@ def cv_insert_to_db(message, message_id, language):
         running = True
         while running:
             start_time = time.time()
+            animation = ["Kuting, yuklanmoqda .", "Kuting, yuklanmoqda ..", "Kuting, yuklanmoqda ..."]
 
             while time.time() - start_time < 2:
-                time.sleep(0.1)
-                bot.edit_message_text("Kuting, yuklanmoqda .", message.chat.id, message_id=loading_message.message_id)
-                time.sleep(0.1)
-                bot.edit_message_text("Kuting, yuklanmoqda ..", message.chat.id, message_id=loading_message.message_id)
-                time.sleep(0.1)
-                bot.edit_message_text("Kuting, yuklanmoqda ...", message.chat.id, message_id=loading_message.message_id)
+                for frame in animation:
+                    bot.edit_message_text(frame, message.chat.id, message_id=loading_message.message_id)
+                    time.sleep(0.1)
             running = False
 
-        message_id = bot.edit_message_text(chat_id=message.chat.id, message_id=loading_message.id, text="Taklif yuborildi ✔️")
+        message___id = bot.edit_message_text(chat_id=message.chat.id, message_id=loading_message.id, text="Taklif yuborildi ✅")
         time.sleep(1)
 
+        delete__message(user_id, message___id.id)
+
+        text = f'''
+    User ID : {response[0]['user_id']}
+Isim : {response[0]['name']}
+Sharif : {response[0]['surname']}
+Telefon nomer : +{response[0]['phone_number']}\n\n
+            '''
+        directory = os.path.join("media", "cv_photo", str(user_id))
+        photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
+        try:
+            image_id = bot.send_photo(message.chat.id, photo=open(photo_path, 'rb'))
+            message_id = image_id.message_id
+            user = str(user_id)
+            image[user] = message_id
+        except:
+            ...
         markup = my_account_uz()
-        bot.edit_message_text(chat_id=message.chat.id, message_id=loading_message.id, text="Ishga bog\'liq funksiyalar shu yerda.\nQaysidur o\'zingizga kerakli knopkani bosing", reply_markup=markup)
+        bot.send_message(user_id,
+                            f"{text}\n\nNma qilmohchisiz :......", reply_markup=markup)
+        print(post_cv(cvs_data['image'], cvs_data['bio'], user_id))
 
 
 
@@ -905,7 +1016,10 @@ def change_photo(message, message_id, lang):
 Фамилия : {response[0]['surname']}
 Телефон номера : +{response[0]['phone_number']}\n\n
             '''
-            markup = my_account_rus()
+            if get_cv(user_id) == True:
+                markup = my_account_rus(is_exists=True)
+            else:
+                markup = my_account_rus(is_exists=None)
             bot.send_message(user_id, f"{text}\n\nЧто вы хотите сделать :......", reply_markup=markup)
         elif lang == 'uz':
             response = get_employee(user_id)
@@ -915,8 +1029,11 @@ Isim : {response[0]['name']}
 Sharif : {response[0]['surname']}
 Telefon nomer : +{response[0]['phone_number']}\n\n
             '''
-            markup = my_account_uz()
-            bot.send_message(user_id, f"{text}\n\nNima qilmohchisiz :......", reply_markup=markup)
+        if get_cv(user_id) == True:
+            markup = my_account_uz(is_exists=True)
+        else:
+            markup = my_account_uz(is_exists=None)
+        bot.send_message(user_id, f"{text}\n\nNima qilmohchisiz :......", reply_markup=markup)
     else: 
         bot.register_next_step_handler(message, change_photo)
 
@@ -938,6 +1055,7 @@ def change_phonenumber_rus(message, message_id, lang):
         ...
         
     if lang == 'ru':
+        cv = get_cv(user_id)
         print(patch_employees(user_id, value, 'phone'))
         response = get_employee(user_id)
         text = f'''
@@ -946,7 +1064,10 @@ def change_phonenumber_rus(message, message_id, lang):
 Фамилия : {response[0]['surname']}
 Телефон номера : +{response[0]['phone_number']}\n\n
             '''
-        markup = my_account_rus()
+        if get_cv(user_id) == True:
+                markup = my_account_rus(is_exists=True)
+        else:
+            markup = my_account_rus(is_exists=None)
         bot.send_message(user_id, f"{text}\n\nЧто вы хотите сделать :......", reply_markup=markup)
     elif lang == 'uz':
         print(patch_employees(user_id, value, 'phone'))
@@ -957,7 +1078,10 @@ Isim : {response[0]['name']}
 Sharif : {response[0]['surname']}
 Telefon nomer : +{response[0]['phone_number']}\n\n
             '''
-        markup = my_account_uz()
+        if get_cv(user_id) == True:
+            markup = my_account_uz(is_exists=True)
+        else:
+            markup = my_account_uz(is_exists=None)
         bot.send_message(user_id, f"{text}\n\nNima qilmohchisiz :......", reply_markup=markup)
 
 def change_name_rus(message, message_id, lang):
@@ -966,7 +1090,6 @@ def change_name_rus(message, message_id, lang):
 
     delete__message(user_id, message.id)
     delete__message(user_id, message_id)
-
 
     try:
         directory = os.path.join("media", "cv_photo", str(user_id))
@@ -987,7 +1110,10 @@ def change_name_rus(message, message_id, lang):
 Фамилия : {response[0]['surname']}
 Телефон номера : +{response[0]['phone_number']}\n\n
             '''
-        markup = my_account_rus()
+        if get_cv(user_id) == True:
+            markup = my_account_rus(is_exists=True)
+        else:
+            markup = my_account_rus(is_exists=None)
         bot.send_message(user_id, f"{text}\n\nЧто вы хотите сделать :......", reply_markup=markup)
     elif lang == 'uz':
         print(patch_employees(user_id, value, 'name'))
@@ -998,7 +1124,10 @@ Isim : {response[0]['name']}
 Sharif : {response[0]['surname']}
 Telefon nomer : +{response[0]['phone_number']}\n\n
             '''
-        markup = my_account_uz()
+        if get_cv(user_id) == True:
+            markup = my_account_uz(is_exists=True)
+        else:
+            markup = my_account_uz(is_exists=None)
         bot.send_message(user_id, f"{text}\n\nNima qilmohchisiz :......", reply_markup=markup)
 
 def change_surname_rus(message, message_id, lang):
@@ -1028,7 +1157,10 @@ def change_surname_rus(message, message_id, lang):
 Фамилия : {response[0]['surname']}
 Телефон номера : +{response[0]['phone_number']}\n\n
             '''
-        markup = my_account_rus()
+        if get_cv(user_id) == True:
+            markup = my_account_rus(is_exists=True)
+        else:
+            markup = my_account_rus(is_exists=None)
         bot.send_message(user_id, f"{text}\n\nЧто вы хотите сделать :......", reply_markup=markup)
     elif lang == 'uz':
         print(patch_employees(user_id, value, 'surname'))
@@ -1039,9 +1171,11 @@ Isim : {response[0]['name']}
 Sharif : {response[0]['surname']}
 Telefon nomer : +{response[0]['phone_number']}\n\n
         '''
-        markup = my_account_uz()
+        if get_cv(user_id) == True:
+            markup = my_account_uz(is_exists=True)
+        else:
+            markup = my_account_uz(is_exists=None)
         bot.send_message(user_id, f"{text}\n\nNima qilmohchisiz :......", reply_markup=markup)
-
 
 
 

@@ -14,16 +14,18 @@ def get_employee(user_id):
     else:
         return None    
 
-print(get_employee(1231138963))
 
 def get_cv(user_id):
-    response = requests.get(f'{BASE_URL}cvs/?user_id={user_id}')
+    get_id_from = requests.get(f'{BASE_URL}employees/?user_id={user_id}')
+    id = get_id_from.json()
+    id_value = id[0]['id']
+    response = requests.get(f'{BASE_URL}cvs/?owner_id={id_value}')
     response.json()
     if response.status_code == 200:
         if response.json() == []:
             return None
         else:
-            return response[0]['media']
+            return True
     else:
         return response.json() 
         
@@ -145,7 +147,11 @@ def post_passport(user_id, url):
                         'Json': response.json()}]   
 
 
-def post_cv(image, bio, owner_id):
+def post_cv(image, bio, user_id):
+    get_id_from = requests.get(f'{BASE_URL}employees/?user_id={user_id}')
+    id = get_id_from.json()
+    owner_id = id[0]['id']
+    
     data = {
         'media': image,
         'bio': bio,
@@ -260,4 +266,4 @@ def stopwatch():
     elapsed_time = end_time - start_time
     print(f"\n\nПрошло времени: {elapsed_time:.3f} секунд")
 
-stopwatch()
+# stopwatch()

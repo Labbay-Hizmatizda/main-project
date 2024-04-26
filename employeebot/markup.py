@@ -24,12 +24,11 @@ def back_about_us():
 def my_account_rus(is_exists):
     markup = types.InlineKeyboardMarkup(row_width=2)
     if is_exists == True:
-        change_photo = types.InlineKeyboardButton('✏️ Фото 🖼', callback_data='change_photo')
-        change_bio = types.InlineKeyboardButton('Изменить биографию ', callback_data='change_bio')
-        markup.add(change_photo)
-        markup.add(change_bio)
+        change_photo = types.InlineKeyboardButton('Изменить Фото 🖼', callback_data='change_photo')
+        change_bio = types.InlineKeyboardButton('Изменить биографию 📋', callback_data='change_bio')
+        markup.add(change_photo, change_bio)
     else:
-        add_cv = types.InlineKeyboardButton('Создать резюме 🪪', callback_data='add_cv')
+        add_cv = types.InlineKeyboardButton('Создать резюме 🪪', callback_data='add_cv_rus')
         markup.add(add_cv)
 
     change_phone_number = types.InlineKeyboardButton('Изменить номер ☎️', callback_data='change_phonenumber_rus')
@@ -108,16 +107,22 @@ def back_about_us_uz():
 
     return markup
 
-def my_account_uz():
-    markup = types.InlineKeyboardMarkup(row_width=1)
+def my_account_uz(is_exists):
+    markup = types.InlineKeyboardMarkup(row_width=2)
+    if is_exists == True:
+        change_photo = types.InlineKeyboardButton('Rasimni o\'zgartirish 🖼', callback_data='change_photo_uz')
+        change_bio = types.InlineKeyboardButton('Tarzimai holni o\'zgartirish 📋', callback_data='change_bio_uz')
+        markup.add(change_photo, change_bio)
+    else:
+        add_cv = types.InlineKeyboardButton('Rezyume yaratish 🪪', callback_data='add_cv_uz')
+        markup.add(add_cv)
 
-    change_photo = types.InlineKeyboardButton('Rasimni o\'zgartirish 🖼', callback_data='change_photo_uz')
     change_phone_number = types.InlineKeyboardButton('Nomerni o\'zgartirish ☎️', callback_data='change_phonenumber_uz')
     change_name = types.InlineKeyboardButton('Isimni o\'zgartirish 👤', callback_data='change_name_uz')
     change_surname = types.InlineKeyboardButton('Sharifni o\'zgartirish 👤', callback_data='change_surname_uz')
     change_language = types.InlineKeyboardButton('Tilni o\'zgartirish 🌍', callback_data='change_language_uz')
     back = types.InlineKeyboardButton('Orqaga ◀️', callback_data='back_to_main_menu_uz')
-    markup.add(change_photo, change_name, change_surname, change_phone_number, change_language, back)
+    markup.add(change_name, change_surname, change_phone_number, change_language, back)
     return markup
 
 def authorizing_uz():
