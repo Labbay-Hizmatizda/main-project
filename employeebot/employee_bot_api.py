@@ -20,6 +20,8 @@ from api_integration import *
 # TODO |>6<| add rating and bio insight of the my_account                  #
 # TODO |>5<| add markups in active proposals by ID                         #
 # TODO |>6<| add output of proposal detail and order's information         #
+# TODO |>6<| add output of proposal detail and order's information         #
+
 
 # FIX LATER                                                                #
 # TODO |>7<| THINK ABOUT NOTIFICATION LOGICS               #FIX            #
@@ -106,13 +108,9 @@ def callback_query(call):
         if response != None:
             delete__message(user_id, call.message.id)
 
-            text = f'''
-    ID : {response[0]['user_id']}
-Имя : {response[0]['name']}
-Фамилия : {response[0]['surname']}
-Телефон номера : +{response[0]['phone_number']}\n\n
-            '''
-            try:
+            response_cv = get_cv(user_id)
+
+            try:  
                 directory = os.path.join("media", "cv_photo", str(user_id))
                 photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
                 image_id = bot.send_photo(call.message.chat.id, photo=open(photo_path, 'rb'))
@@ -122,13 +120,37 @@ def callback_query(call):
             except:
                 ...
 
-            if get_cv(user_id) == True:
+            if response_cv:
+                rating = response_cv[0]['rating']
+                bio = response_cv[0]['bio']
+                star = ''
+
+                for s in range(rating):
+                    star += '🌕'
+                n = 5 - rating
+                for s in range(n):
+                    star += '🌑'
+
+                text = f'''
+ID : {response[0]['user_id']}
+Имя : {response[0]['name']}
+Фамилия : {response[0]['surname']}
+Телефон номера : +{response[0]['phone_number']}\n
+Ваш рейтинг : {star}
+Ваша биография : {bio}
+                '''
                 markup = my_account_rus(is_exists=True)
             else:
+                text = f'''
+ID : {response[0]['user_id']}
+Имя : {response[0]['name']}
+Фамилия : {response[0]['surname']}
+Телефон номера : +{response[0]['phone_number']}\n
+                '''
                 markup = my_account_rus(is_exists=None)
             bot.send_message(call.message.chat.id,
-                                f"{text}Какое действие вы хотите сделать :......", reply_markup=markup)
-            
+                                f"{text}\n\nКакое действие вы хотите сделать :......", reply_markup=markup)
+
         else:
             markup = authorizing()
             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.id, text=f"Пожалуйста зарегайтесь или войдите в свой аккаунт чтобы получить эти функции", reply_markup=markup)
@@ -240,12 +262,8 @@ def callback_query(call):
         delete__message(user_id, message_id)
 
         response = get_employee(user_id)
-        text = f'''
-ID : {response[0]['user_id']}
-Имя : {response[0]['name']}
-Фамилия : {response[0]['surname']}
-Телефон номера : +{response[0]['phone_number']}\n\n
-        '''
+        response_cv = get_cv(user_id)
+        
         try:
             directory = os.path.join("media", "cv_photo", str(user_id))
             photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
@@ -256,9 +274,33 @@ ID : {response[0]['user_id']}
         except:
             ...
 
-        if get_cv(user_id) == True:
+        if response_cv:
+            rating = response_cv[0]['rating']
+            bio = response_cv[0]['bio']
+            star = ''
+
+            for s in range(rating):
+                star += '🌕'
+            n = 5 - rating
+            for s in range(n):
+                star += '🌑'
+
+            text = f'''
+ID : {response[0]['user_id']}
+Имя : {response[0]['name']}
+Фамилия : {response[0]['surname']}
+Телефон номера : +{response[0]['phone_number']}\n
+Ваш рейтинг : {star}
+Ваша биография : {bio}
+            '''
             markup = my_account_rus(is_exists=True)
         else:
+            text = f'''
+ID : {response[0]['user_id']}
+Имя : {response[0]['name']}
+Фамилия : {response[0]['surname']}
+Телефон номера : +{response[0]['phone_number']}\n
+            '''
             markup = my_account_rus(is_exists=None)      
         bot.send_message(chat_id=call.message.chat.id,
                             text=f"{text}\n\nКакое действие вы хотите сделать :......", reply_markup=markup)
@@ -372,12 +414,25 @@ ID : {response[0]['user_id']}
 
             delete__message(user_id, call.message.id)
 
+            response_cv = get_cv(user_id)
+            rating = response_cv[0]['rating']
+            bio = response_cv[0]['bio']
+            star = ''
+
+            for s in range(rating):
+                star += '🌕'
+            n = 5 - rating
+            for s in range(n):
+                star += '🌑'
+
             text = f'''
-        User ID : {response[0]['user_id']}
+ID : {response[0]['user_id']}
 Isim : {response[0]['name']}
 Sharif : {response[0]['surname']}
-Telefon nomer : +{response[0]['phone_number']}\n\n
-                '''
+Telefon nomer : +{response[0]['phone_number']}\n
+Reyting : {star}
+Tarjimai hol : {bio}
+            '''
             
             directory = os.path.join("media", "cv_photo", str(user_id))
             photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
@@ -388,7 +443,7 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
                 image[user] = message_id
             except:
                 ...
-            if get_cv(user_id) == True:
+            if response_cv:
                 markup = my_account_uz(is_exists=True)
             else:
                 markup = my_account_uz(is_exists=None)
@@ -499,11 +554,24 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
         
         print(patch_lang(user_id, 'uz'))
         response = get_employee(user_id)
+        response_cv = get_cv(user_id)
+        rating = response_cv[0]['rating']
+        bio = response_cv[0]['bio']
+        star = ''
+
+        for s in range(rating):
+            star += '🌕'
+        n = 5 - rating
+        for s in range(n):
+            star += '🌑'
+
         text = f'''
 ID : {response[0]['user_id']}
 Isim : {response[0]['name']}
 Sharif : {response[0]['surname']}
-Telefon nomer : +{response[0]['phone_number']}\n\n
+Telefon nomer : +{response[0]['phone_number']}\n
+Reyting : {star}
+Tarjimai hol : {bio}
         '''
         try:
             directory = os.path.join("media", "cv_photo", str(user_id))
@@ -515,13 +583,12 @@ Telefon nomer : +{response[0]['phone_number']}\n\n
         except:
             ...
 
-        if get_cv(user_id) == True:
+        if response_cv:
             markup = my_account_uz(is_exists=True)
         else:
             markup = my_account_uz(is_exists=None)
         bot.send_message(call.message.chat.id,
                             f"{text}\n\nNma qilmohchisiz :......", reply_markup=markup)
-
 
     elif call.data == 'back_to_main_menu_uz':
         markup = uzbek()
@@ -818,12 +885,6 @@ def cv_insert_to_db(message, message_id, language):
 
         response = get_employee(user_id)
 
-        text = f'''
-ID : {response[0]['user_id']}
-Имя : {response[0]['name']}
-Фамилия : {response[0]['surname']}
-Телефон номера : +{response[0]['phone_number']}\n\n
-        '''
         try:
             directory = os.path.join("media", "cv_photo", str(user_id))
             photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
@@ -834,9 +895,35 @@ ID : {response[0]['user_id']}
         except:
             ...
 
-        if get_cv(user_id) == True:
+        response_cv = get_cv(user_id)
+
+        if response_cv:
+            rating = response_cv[0]['rating']
+            bio = response_cv[0]['bio']
+            star = ''
+
+            for s in range(rating):
+                star += '🌕'
+            n = 5 - rating
+            for s in range(n):
+                star += '🌑'
+
+            text = f'''
+ID : {response[0]['user_id']}
+Имя : {response[0]['name']}
+Фамилия : {response[0]['surname']}
+Телефон номера : +{response[0]['phone_number']}\n
+Ваш рейтинг : {star}
+Ваша биография : {bio}
+            '''
             markup = my_account_rus(is_exists=True)
         else:
+            text = f'''
+ID : {response[0]['user_id']}
+Имя : {response[0]['name']}
+Фамилия : {response[0]['surname']}
+Телефон номера : +{response[0]['phone_number']}\n
+            '''
             markup = my_account_rus(is_exists=None)
         bot.send_message(message.chat.id, f"{text}Какое действие вы хотите сделать :......", reply_markup=markup)
         print(post_cv(cvs_data['image'], cvs_data['bio'], user_id))
@@ -865,12 +952,26 @@ ID : {response[0]['user_id']}
 
         delete__message(user_id, message___id.id)
 
+        response_cv = get_cv(user_id)
+        rating = response_cv[0]['rating']
+        bio = response_cv[0]['bio']
+        star = ''
+
+        for s in range(rating):
+            star += '🌕'
+        n = 5 - rating
+        for s in range(n):
+            star += '🌑'
+
         text = f'''
-    User ID : {response[0]['user_id']}
+ID : {response[0]['user_id']}
 Isim : {response[0]['name']}
 Sharif : {response[0]['surname']}
-Telefon nomer : +{response[0]['phone_number']}\n\n
-            '''
+Telefon nomer : +{response[0]['phone_number']}\n
+Reyting : {star}
+Tarjimai hol : {bio}
+        '''
+
         directory = os.path.join("media", "cv_photo", str(user_id))
         photo_path = os.path.join(directory, f'{str(user_id)}.jpg')
         try:
@@ -1010,30 +1111,57 @@ def change_photo(message, message_id, lang):
             ...
         if lang == 'ru':
             response = get_employee(user_id)
+            response_cv = get_cv(user_id)
+            rating = response_cv[0]['rating']
+            bio = response_cv[0]['bio']
+            star = ''
+
+            for s in range(rating):
+                star += '🌕'
+            n = 5 - rating
+            for s in range(n):
+                star += '🌑'
+
             text = f'''
-    ID : {response[0]['user_id']}
+ID : {response[0]['user_id']}
 Имя : {response[0]['name']}
 Фамилия : {response[0]['surname']}
-Телефон номера : +{response[0]['phone_number']}\n\n
+Телефон номера : +{response[0]['phone_number']}\n
+Ваш рейтинг : {star}
+Ваша биография : {bio}
             '''
-            if get_cv(user_id) == True:
+            if response_cv:
                 markup = my_account_rus(is_exists=True)
             else:
                 markup = my_account_rus(is_exists=None)
             bot.send_message(user_id, f"{text}\n\nЧто вы хотите сделать :......", reply_markup=markup)
+        
         elif lang == 'uz':
             response = get_employee(user_id)
+            response_cv = get_cv(user_id)
+            rating = response_cv[0]['rating']
+            bio = response_cv[0]['bio']
+            star = ''
+
+            for s in range(rating):
+                star += '🌕'
+            n = 5 - rating
+            for s in range(n):
+                star += '🌑'
+
             text = f'''
     ID : {response[0]['user_id']}
-Isim : {response[0]['name']}
-Sharif : {response[0]['surname']}
-Telefon nomer : +{response[0]['phone_number']}\n\n
+    Isim : {response[0]['name']}
+    Sharif : {response[0]['surname']}
+    Telefon nomer : +{response[0]['phone_number']}\n
+    Reyting : {star}
+    Tarjimai hol : {bio}
             '''
-        if get_cv(user_id) == True:
-            markup = my_account_uz(is_exists=True)
-        else:
-            markup = my_account_uz(is_exists=None)
-        bot.send_message(user_id, f"{text}\n\nNima qilmohchisiz :......", reply_markup=markup)
+            if response_cv:
+                markup = my_account_uz(is_exists=True)
+            else:
+                markup = my_account_uz(is_exists=None)
+            bot.send_message(user_id, f"{text}\n\nNima qilmohchisiz :......", reply_markup=markup)
     else: 
         bot.register_next_step_handler(message, change_photo)
 
@@ -1055,30 +1183,56 @@ def change_phonenumber_rus(message, message_id, lang):
         ...
         
     if lang == 'ru':
-        cv = get_cv(user_id)
         print(patch_employees(user_id, value, 'phone'))
         response = get_employee(user_id)
+        response_cv = get_cv(user_id)
+        rating = response_cv[0]['rating']
+        bio = response_cv[0]['bio']
+        star = ''
+
+        for s in range(rating):
+            star += '🌕'
+        n = 5 - rating
+        for s in range(n):
+            star += '🌑'
+
         text = f'''
-    ID : {response[0]['user_id']}
+ID : {response[0]['user_id']}
 Имя : {response[0]['name']}
 Фамилия : {response[0]['surname']}
-Телефон номера : +{response[0]['phone_number']}\n\n
-            '''
-        if get_cv(user_id) == True:
-                markup = my_account_rus(is_exists=True)
+Телефон номера : +{response[0]['phone_number']}\n
+Ваш рейтинг : {star}
+Ваша биография : {bio}
+        '''
+        if response_cv:
+            markup = my_account_rus(is_exists=True)
         else:
             markup = my_account_rus(is_exists=None)
         bot.send_message(user_id, f"{text}\n\nЧто вы хотите сделать :......", reply_markup=markup)
+    
     elif lang == 'uz':
         print(patch_employees(user_id, value, 'phone'))
         response = get_employee(user_id)
+        response_cv = get_cv(user_id)
+        rating = response_cv[0]['rating']
+        bio = response_cv[0]['bio']
+        star = ''
+
+        for s in range(rating):
+            star += '🌕'
+        n = 5 - rating
+        for s in range(n):
+            star += '🌑'
+
         text = f'''
-    ID : {response[0]['user_id']}
+ID : {response[0]['user_id']}
 Isim : {response[0]['name']}
 Sharif : {response[0]['surname']}
-Telefon nomer : +{response[0]['phone_number']}\n\n
-            '''
-        if get_cv(user_id) == True:
+Telefon nomer : +{response[0]['phone_number']}\n
+Reyting : {star}
+Tarjimai hol : {bio}
+        '''
+        if response_cv:
             markup = my_account_uz(is_exists=True)
         else:
             markup = my_account_uz(is_exists=None)
@@ -1104,27 +1258,54 @@ def change_name_rus(message, message_id, lang):
     if lang == 'ru':  
         print(patch_employees(user_id, value, 'name'))
         response = get_employee(user_id)
+        response_cv = get_cv(user_id)
+        rating = response_cv[0]['rating']
+        bio = response_cv[0]['bio']
+        star = ''
+
+        for s in range(rating):
+            star += '🌕'
+        n = 5 - rating
+        for s in range(n):
+            star += '🌑'
+
         text = f'''
-    ID : {response[0]['user_id']}
+ID : {response[0]['user_id']}
 Имя : {response[0]['name']}
 Фамилия : {response[0]['surname']}
-Телефон номера : +{response[0]['phone_number']}\n\n
-            '''
-        if get_cv(user_id) == True:
+Телефон номера : +{response[0]['phone_number']}\n
+Ваш рейтинг : {star}
+Ваша биография : {bio}
+        '''
+        if response_cv:
             markup = my_account_rus(is_exists=True)
         else:
             markup = my_account_rus(is_exists=None)
         bot.send_message(user_id, f"{text}\n\nЧто вы хотите сделать :......", reply_markup=markup)
+    
     elif lang == 'uz':
         print(patch_employees(user_id, value, 'name'))
         response = get_employee(user_id)
+        response_cv = get_cv(user_id)
+        rating = response_cv[0]['rating']
+        bio = response_cv[0]['bio']
+        star = ''
+
+        for s in range(rating):
+            star += '🌕'
+        n = 5 - rating
+        for s in range(n):
+            star += '🌑'
+
         text = f'''
-    ID : {response[0]['user_id']}
+ID : {response[0]['user_id']}
 Isim : {response[0]['name']}
 Sharif : {response[0]['surname']}
-Telefon nomer : +{response[0]['phone_number']}\n\n
-            '''
-        if get_cv(user_id) == True:
+Telefon nomer : +{response[0]['phone_number']}\n
+Reyting : {star}
+Tarjimai hol : {bio}
+        '''
+        if response_cv:
             markup = my_account_uz(is_exists=True)
         else:
             markup = my_account_uz(is_exists=None)
@@ -1151,27 +1332,54 @@ def change_surname_rus(message, message_id, lang):
     if lang == 'ru':
         print(patch_employees(user_id, value, 'surname'))
         response = get_employee(user_id)
+        response_cv = get_cv(user_id)
+        rating = response_cv[0]['rating']
+        bio = response_cv[0]['bio']
+        star = ''
+
+        for s in range(rating):
+            star += '🌕'
+        n = 5 - rating
+        for s in range(n):
+            star += '🌑'
+
         text = f'''
-    ID : {response[0]['user_id']}
+ID : {response[0]['user_id']}
 Имя : {response[0]['name']}
 Фамилия : {response[0]['surname']}
-Телефон номера : +{response[0]['phone_number']}\n\n
-            '''
-        if get_cv(user_id) == True:
+Телефон номера : +{response[0]['phone_number']}\n
+Ваш рейтинг : {star}
+Ваша биография : {bio}
+        '''
+        if response_cv:
             markup = my_account_rus(is_exists=True)
         else:
             markup = my_account_rus(is_exists=None)
         bot.send_message(user_id, f"{text}\n\nЧто вы хотите сделать :......", reply_markup=markup)
+    
     elif lang == 'uz':
         print(patch_employees(user_id, value, 'surname'))
         response = get_employee(user_id)
+        response_cv = get_cv(user_id)
+        rating = response_cv[0]['rating']
+        bio = response_cv[0]['bio']
+        star = ''
+
+        for s in range(rating):
+            star += '🌕'
+        n = 5 - rating
+        for s in range(n):
+            star += '🌑'
+
         text = f'''
-    ID : {response[0]['user_id']}
+ID : {response[0]['user_id']}
 Isim : {response[0]['name']}
 Sharif : {response[0]['surname']}
-Telefon nomer : +{response[0]['phone_number']}\n\n
+Telefon nomer : +{response[0]['phone_number']}\n
+Reyting : {star}
+Tarjimai hol : {bio}
         '''
-        if get_cv(user_id) == True:
+        if response_cv:
             markup = my_account_uz(is_exists=True)
         else:
             markup = my_account_uz(is_exists=None)

@@ -25,10 +25,11 @@ def get_cv(user_id):
         if response.json() == []:
             return None
         else:
-            return True
+            return response.json()
     else:
         return response.json() 
-        
+
+print(get_cv(1231138963)) 
 
 def get_categories():
     response = requests.get(f'{BASE_URL}category')
